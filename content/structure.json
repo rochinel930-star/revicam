@@ -1,0 +1,23 @@
+{
+  "classes": [
+    { "slug": "premiere-d", "nom": "Première D", "ordre": 60 }
+  ],
+  "matieres": [
+    { "slug": "physique", "nom": "Physique", "couleur": "#E8524A", "icone": "⚡" },
+    { "slug": "svteehb", "nom": "SVTEEHB", "couleur": "#00C896", "icone": "🌱" },
+    { "slug": "maths", "nom": "Mathématiques", "couleur": "#4A9EE8", "icone": "📐" },
+    { "slug": "chimie", "nom": "Chimie", "couleur": "#9B59B6", "icone": "🧪" }
+  ],
+  "classe_matieres": [
+    { "classe": "premiere-d", "matiere": "physique" },
+    { "classe": "premiere-d", "matiere": "svteehb" },
+    { "classe": "premiere-d", "matiere": "maths" },
+    { "classe": "premiere-d", "matiere": "chimie" }
+  ],
+  "modules": [
+    { "classe": "premiere-d", "matiere": "physique", "numero": 1, "titre": "Mesures et incertitudes" },
+    { "classe": "premiere-d", "matiere": "physique", "numero": 2, "titre": "Mouvements et interactions" },
+    { "classe": "premiere-d", "matiere": "physique", "numero": 3, "titre": "Optique géométrique" },
+    { "classe": "premiere-d", "matiere": "physique", "numero": 4, "titre": "Aspects énergétiques des circuits électriques" }
+  ]
+}

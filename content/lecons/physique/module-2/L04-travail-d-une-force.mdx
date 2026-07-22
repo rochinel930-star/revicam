@@ -1,0 +1,370 @@
+---
+classe: premiere-d
+matiere: physique
+module: 2
+numero: 4
+titre: Travail d'une force
+slug: travail-d-une-force
+duree: 25
+publie: true
+objectifs:
+  - "Définir le travail d'une force constante"
+  - "Calculer le travail d'une force constante lors d'un déplacement rectiligne"
+  - "Distinguer travail moteur, travail résistant et travail nul"
+  - "Calculer le travail du poids d'un corps"
+  - "Définir et calculer la puissance d'une force"
+---
+
+## Cours
+
+### 1. Situation de vie
+
+Au marché de Mokolo à Yaoundé, un porteur soulève un sac de riz de 50 kg et le
+monte sur sa tête pour le transporter. Un autre pousse un pousse-pousse chargé
+sur la route. Tous les deux **fournissent un effort** pour déplacer une charge :
+en physique, on dit que leurs forces **travaillent**. Cette leçon te donne
+l'outil pour mesurer ce travail — le même outil qui permet de calculer l'énergie
+produite par une chute d'eau au barrage de Song Loulou.
+
+### 2. Notion de travail d'une force
+
+Une force travaille lorsqu'elle **déplace son point d'application**. Une force
+qui ne provoque ni n'accompagne aucun déplacement ne travaille pas : un mur qui
+soutient une étagère n'effectue aucun travail, même s'il exerce une force.
+
+:::definition Travail d'une force
+Le travail d'une force est une grandeur physique qui mesure l'énergie
+transférée par cette force lorsque son point d'application se déplace.
+Il se note **W** (de l'anglais *work*) et s'exprime en **joules (J)**.
+:::
+
+### 3. Travail d'une force constante en translation rectiligne
+
+Considérons une force constante F⃗ dont le point d'application se déplace
+en ligne droite d'une longueur d. La force fait un angle α avec la direction
+du déplacement.
+
+<svg viewBox="0 0 420 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Schéma : caisse tirée par une force F faisant un angle alpha avec le déplacement d">
+  <line x1="20" y1="120" x2="400" y2="120" stroke="currentColor" stroke-width="2"/>
+  <rect x="60" y="80" width="60" height="40" fill="none" stroke="currentColor" stroke-width="2"/>
+  <line x1="120" y1="100" x2="230" y2="45" stroke="#E8524A" stroke-width="3"/>
+  <polygon points="230,45 214,49 222,60" fill="#E8524A"/>
+  <text x="238" y="45" fill="#E8524A" font-size="16" font-weight="bold">F⃗</text>
+  <path d="M 160 100 A 40 40 0 0 0 155 82" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  <text x="170" y="92" font-size="14">α</text>
+  <line x1="120" y1="135" x2="330" y2="135" stroke="#1A237E" stroke-width="2" stroke-dasharray="none"/>
+  <polygon points="330,135 316,130 316,140" fill="#1A237E"/>
+  <text x="220" y="150" fill="#1A237E" font-size="14" font-weight="bold">d</text>
+</svg>
+
+:::formule Travail d'une force constante
+**W(F⃗) = F × d × cos α**
+
+- W : travail en joules (J)
+- F : intensité de la force en newtons (N)
+- d : longueur du déplacement en mètres (m)
+- α : angle entre la force et le déplacement
+:::
+
+Le signe du travail dépend de l'angle α :
+
+| Angle | cos α | Travail | Nom |
+|---|---|---|---|
+| 0° ≤ α &lt; 90° | positif | W &gt; 0 | **travail moteur** (la force aide le mouvement) |
+| α = 90° | nul | W = 0 | **travail nul** (la force ne travaille pas) |
+| 90° &lt; α ≤ 180° | négatif | W &lt; 0 | **travail résistant** (la force s'oppose au mouvement) |
+
+Cas particuliers utiles :
+- Force dans le sens du déplacement (α = 0°) : W = F × d
+- Force opposée au déplacement (α = 180°) : W = −F × d
+- Les forces de frottement, toujours opposées au mouvement, ont un travail
+  **résistant** : W(f⃗) = −f × d
+
+:::exemple Exemple résolu — le pousseur de Mokolo
+Un pousseur exerce une force constante de 250 N inclinée de 30° au-dessus de
+l'horizontale pour déplacer son pousse-pousse de 80 m sur une route plane.
+Calculer le travail de sa force. (cos 30° ≈ 0,87)
+
+**Solution.**
+W(F⃗) = F × d × cos α = 250 × 80 × cos 30°
+W(F⃗) = 250 × 80 × 0,87 = **17 400 J ≈ 17,4 kJ**
+Le travail est positif : c'est un travail moteur, la force du pousseur fait
+avancer le pousse-pousse.
+:::
+
+### 4. Travail du poids d'un corps
+
+Le poids P⃗ = m·g⃗ est une force constante dirigée vers le bas. Lorsqu'un corps
+se déplace entre un point A et un point B, seul compte le **dénivelé**
+h = |z_A − z_B|, c'est-à-dire la différence d'altitude.
+
+:::formule Travail du poids
+**W(P⃗) = ± m × g × h**
+
+- signe **+** si le corps **descend** (travail moteur)
+- signe **−** si le corps **monte** (travail résistant)
+- m : masse en kg · g : intensité de la pesanteur (g ≈ 10 N/kg) · h : dénivelé en m
+:::
+
+Propriété importante : le travail du poids **ne dépend pas du chemin suivi**,
+seulement de l'altitude de départ et d'arrivée. Que le porteur monte un
+escalier droit ou en colimaçon, le travail de son poids est le même.
+
+:::exemple Exemple résolu — la chute d'eau
+Au barrage hydroélectrique de Song Loulou, sur la Sanaga, on admet que l'eau
+chute d'une hauteur h = 40 m. Calculer le travail du poids de 1 000 kg d'eau
+qui descend la chute. (g = 10 N/kg)
+
+**Solution.**
+L'eau descend : le travail du poids est moteur (positif).
+W(P⃗) = + m × g × h = 1 000 × 10 × 40 = **+ 400 000 J = 400 kJ**
+C'est cette énergie que la centrale convertit en électricité.
+:::
+
+### 5. Puissance d'une force
+
+Deux porteurs peuvent monter le même sac au même étage : celui qui va plus vite
+est plus **puissant**. La puissance mesure la rapidité avec laquelle un travail
+est effectué.
+
+:::formule Puissance moyenne
+**P = W / t**
+
+- P : puissance en watts (W)
+- W : travail effectué en joules (J)
+- t : durée en secondes (s)
+
+Pour une force colinéaire à la vitesse : **P = F × v** (v en m/s).
+:::
+
+Autres unités courantes : 1 kW = 1 000 W ; le kilowattheure (kWh) est une
+unité d'**énergie** : 1 kWh = 3 600 000 J = 3,6 × 10⁶ J.
+
+:::exemple Exemple résolu — le taxi de Yaoundé
+Le moteur d'un taxi exerce une force de traction de 1 200 N alors que le taxi
+roule à vitesse constante de 15 m/s (54 km/h) sur l'axe Poste centrale –
+Mvog-Mbi. Calculer la puissance développée par le moteur.
+
+**Solution.**
+La force de traction est dans le sens du mouvement :
+P = F × v = 1 200 × 15 = **18 000 W = 18 kW**
+:::
+
+## Essentiel
+
+- Le travail mesure l'énergie transférée par une force qui déplace son point
+  d'application : **W(F⃗) = F × d × cos α**, en joules (J).
+- **Moteur** si α &lt; 90° (W &gt; 0) · **nul** si α = 90° · **résistant** si α &gt; 90° (W &lt; 0).
+- Frottements : toujours résistants, W(f⃗) = −f × d.
+- Poids : **W(P⃗) = ± mgh** (+ à la descente, − à la montée), indépendant du
+  chemin suivi.
+- Puissance : **P = W / t** en watts (W) ; force colinéaire à la vitesse :
+  P = F × v.
+- 1 kWh = 3,6 × 10⁶ J (unité d'énergie, pas de puissance).
+
+## JeuBilingue
+
+| Français | English |
+|---|---|
+| le travail d'une force | the work of a force |
+| une force | a force |
+| le poids | the weight |
+| le déplacement | the displacement |
+| la puissance | the power |
+| le joule | the joule |
+| le watt | the watt |
+| travail moteur | driving (positive) work |
+| travail résistant | resistive (negative) work |
+| la hauteur | the height |
+| la vitesse | the speed |
+| les frottements | friction |
+
+## QCM
+
+### Q1
+Dans le Système international, le travail d'une force s'exprime en :
+
+- [ ] watts (W)
+- [x] joules (J)
+- [ ] newtons (N)
+- [ ] kilogrammes (kg)
+
+> Explication : Le travail est une énergie transférée : il se mesure en joules. Le watt mesure la puissance, le newton mesure une force.
+
+### Q2
+La formule W = F × d × cos α n'est valable que si :
+
+- [x] la force est constante pendant le déplacement
+- [ ] le corps est immobile
+- [ ] l'angle α vaut 90°
+
+> Explication : Cette formule suppose une force constante (même intensité, même direction) sur tout le déplacement.
+
+### Q3
+Lorsque la force est perpendiculaire au déplacement (α = 90°), son travail est :
+
+- [ ] moteur
+- [ ] résistant
+- [x] nul
+
+> Explication : cos 90° = 0, donc W = 0. La force ne travaille pas.
+
+### Q4
+Une force dont l'angle avec le déplacement est de 40° effectue un travail :
+
+- [x] moteur
+- [ ] résistant
+- [ ] nul
+
+> Explication : 40° &lt; 90°, donc cos α &gt; 0 et W &gt; 0 : travail moteur.
+
+### Q5
+Le travail du poids d'un corps qui se déplace d'un point A à un point B dépend :
+
+- [ ] du chemin suivi entre A et B
+- [x] uniquement du dénivelé entre A et B
+- [ ] de la vitesse du corps
+
+> Explication : W(P⃗) = ± mgh : seule compte la différence d'altitude h, jamais le trajet ni la vitesse.
+
+### Q6
+Une force de 100 N déplace son point d'application de 5 m dans sa propre
+direction. Son travail vaut :
+
+- [ ] 20 J
+- [ ] 105 J
+- [x] 500 J
+
+> Explication : α = 0° donc W = F × d = 100 × 5 = 500 J.
+
+### Q7
+Un manguier laisse tomber une mangue de masse m d'une hauteur h. Pendant la
+chute, le travail du poids de la mangue est :
+
+- [x] + mgh (moteur)
+- [ ] − mgh (résistant)
+- [ ] nul
+
+> Explication : La mangue descend : le poids favorise le mouvement, son travail est moteur, W = + mgh.
+
+### Q8
+La puissance d'une force se mesure en :
+
+- [ ] joules (J)
+- [x] watts (W)
+- [ ] kilowattheures (kWh)
+
+> Explication : La puissance se mesure en watts. Le joule et le kWh mesurent une énergie.
+
+### Q9
+Un moteur effectue un travail de 6 000 J en 2 minutes. Sa puissance moyenne est :
+
+- [ ] 3 000 W
+- [x] 50 W
+- [ ] 100 W
+
+> Explication : t = 2 min = 120 s, donc P = W / t = 6 000 / 120 = 50 W. Attention à toujours convertir le temps en secondes !
+
+### Q10
+1 kilowattheure (kWh) vaut :
+
+- [ ] 1 000 J
+- [ ] 3 600 J
+- [x] 3 600 000 J
+
+> Explication : 1 kWh = 1 000 W × 3 600 s = 3,6 × 10⁶ J.
+
+### Q11
+Le travail des forces de frottement sur un corps qui glisse est toujours :
+
+- [ ] moteur
+- [x] résistant
+- [ ] nul
+
+> Explication : Les frottements s'opposent toujours au mouvement (α = 180°), leur travail est donc négatif : résistant.
+
+### Q12
+Un camion roule à vitesse constante v grâce à une force de traction F
+colinéaire à la vitesse. La puissance du moteur s'écrit :
+
+- [x] P = F × v
+- [ ] P = F / v
+- [ ] P = F × v²
+
+> Explication : Pour une force dans le sens du mouvement, P = F × v (F en N, v en m/s, P en W).
+
+## Exercices
+
+### Exercice 1 — Le porteur du marché de Mokolo
+Un porteur soulève un sac de riz de masse m = 50 kg du sol jusqu'au-dessus de
+sa tête, à une hauteur h₁ = 1,7 m. Il monte ensuite un escalier dont le
+sommet se trouve à h₂ = 3,0 m au-dessus du point de départ de la montée.
+On prendra g = 10 N/kg.
+
+1. Calculer le travail du poids du sac pendant la levée.
+2. Calculer le travail du poids du sac pendant la montée de l'escalier.
+3. En déduire le travail total du poids depuis le sol jusqu'en haut de
+   l'escalier. Ce résultat dépend-il de la façon dont le porteur a monté
+   l'escalier ?
+
+#### Corrigé
+**1.** Le sac monte de h₁ = 1,7 m : le travail du poids est résistant.
+W₁(P⃗) = − m g h₁ = − 50 × 10 × 1,7 = **− 850 J**
+
+**2.** Le sac monte encore de h₂ = 3,0 m :
+W₂(P⃗) = − m g h₂ = − 50 × 10 × 3,0 = **− 1 500 J**
+
+**3.** Travail total : W(P⃗) = W₁ + W₂ = − 850 − 1 500 = **− 2 350 J**
+Non : le travail du poids ne dépend pas du chemin suivi, uniquement du
+dénivelé total (1,7 + 3,0 = 4,7 m). On retrouve d'ailleurs
+W = − 50 × 10 × 4,7 = − 2 350 J.
+
+### Exercice 2 — La caisse tirée à la corde
+Une caisse de masse m = 40 kg est tirée sur un sol horizontal sur une
+distance d = 15 m par une corde faisant un angle α = 30° avec l'horizontale.
+La tension de la corde vaut T = 200 N. Les frottements, d'intensité f = 80 N,
+s'opposent au mouvement. On donne cos 30° ≈ 0,87 et g = 10 N/kg.
+
+1. Faire le bilan des forces qui s'exercent sur la caisse.
+2. Calculer le travail de la tension T⃗ de la corde.
+3. Calculer le travail des frottements f⃗.
+4. Que valent les travaux du poids P⃗ et de la réaction normale du sol R⃗ ?
+   Justifier.
+
+#### Corrigé
+**1.** Quatre forces s'exercent sur la caisse : le poids P⃗ (vertical, vers le
+bas), la réaction normale du sol R⃗ (verticale, vers le haut), la tension de
+la corde T⃗ (inclinée de 30°) et les frottements f⃗ (horizontaux, opposés au
+mouvement).
+
+**2.** W(T⃗) = T × d × cos α = 200 × 15 × 0,87 = **+ 2 610 J** (travail moteur)
+
+**3.** Les frottements sont opposés au déplacement (α = 180°) :
+W(f⃗) = − f × d = − 80 × 15 = **− 1 200 J** (travail résistant)
+
+**4.** Le déplacement est horizontal ; P⃗ et R⃗ sont verticales, donc
+perpendiculaires au déplacement (α = 90°, cos α = 0) :
+**W(P⃗) = 0 J et W(R⃗) = 0 J** — travaux nuls.
+
+### Exercice 3 — La centrale de Song Loulou
+Dans une centrale hydroélectrique comme celle de Song Loulou sur la Sanaga,
+on admet que l'eau tombe d'une hauteur h = 40 m avec un débit de 500 m³ par
+seconde. On rappelle qu'un mètre cube d'eau a une masse de 1 000 kg et on
+prend g = 10 N/kg.
+
+1. Calculer la masse d'eau qui chute chaque seconde.
+2. Calculer le travail du poids de cette eau pendant une seconde de chute.
+3. En déduire la puissance fournie par la chute d'eau. Exprimer le résultat
+   en mégawatts (1 MW = 10⁶ W).
+
+#### Corrigé
+**1.** Chaque seconde, 500 m³ d'eau chutent :
+m = 500 × 1 000 = **5 × 10⁵ kg** (500 tonnes chaque seconde !)
+
+**2.** L'eau descend de h = 40 m, le travail du poids est moteur :
+W(P⃗) = + m g h = 5 × 10⁵ × 10 × 40 = **2 × 10⁸ J**
+
+**3.** Ce travail est effectué en t = 1 s :
+P = W / t = 2 × 10⁸ / 1 = 2 × 10⁸ W = **200 MW**
+C'est l'ordre de grandeur de la puissance réellement produite par une grande
+centrale hydroélectrique.

@@ -1,0 +1,5 @@
+classe,matiere,type,numero_sequence,annee,serie,etablissement,titre,pdf,composable,composition_slug,lecons
+premiere-d,physique,sequentielle,2,2025,D,Lycée de Biyem-Assi,"Séquence n°2 — Travail et puissance d'une force",,true,phy-1d-seq2-travail-energie,module-2/travail-d-une-force
+premiere-d,physique,blanc,,2025,D,Collège Jean Tabi,"Examen blanc Probatoire D — Physique (1er trimestre)",,true,phy-1d-seq2-travail-energie,module-2/travail-d-une-force
+premiere-d,physique,officiel,,2024,D,,"Probatoire D 2024 — Épreuve de Physique (démonstration)",/epreuves-demo/probatoire-d-2024-physique-demo.pdf,false,,module-2/travail-d-une-force
+premiere-d,physique,sequentielle,1,2024,D,Collège Vogt,"Séquence n°1 — Mesures et incertitudes (démonstration)",/epreuves-demo/sequence1-2024-physique-demo.pdf,false,,

@@ -1,0 +1,93 @@
+{
+  "slug": "phy-1d-seq2-travail-energie",
+  "titre": "Épreuve séquentielle n°2 — Travail et puissance d'une force",
+  "classe": "premiere-d",
+  "matiere": "physique",
+  "duree_minutes": 60,
+  "mode_affichage": "liste",
+  "publie": true,
+  "questions": [
+    {
+      "type": "qcm",
+      "enonce": "Une force perpendiculaire au déplacement de son point d'application effectue un travail :",
+      "options": ["moteur", "résistant", "nul"],
+      "bonnes_reponses": [2],
+      "bareme": 1.5,
+      "lecon": "module-2/travail-d-une-force"
+    },
+    {
+      "type": "qcm",
+      "enonce": "Dans la formule W(F⃗) = F × d × cos α, l'angle α désigne l'angle entre :",
+      "options": [
+        "la force et la verticale",
+        "la force et la direction du déplacement",
+        "le déplacement et l'horizontale"
+      ],
+      "bonnes_reponses": [1],
+      "bareme": 1.5,
+      "lecon": "module-2/travail-d-une-force"
+    },
+    {
+      "type": "qcm",
+      "enonce": "Une force de 60 N déplace son point d'application de 20 m dans sa propre direction. Son travail vaut :",
+      "options": ["3 J", "80 J", "1 200 J", "12 000 J"],
+      "bonnes_reponses": [2],
+      "bareme": 1.5,
+      "lecon": "module-2/travail-d-une-force"
+    },
+    {
+      "type": "qcm",
+      "enonce": "Lorsqu'un corps monte, le travail de son poids est :",
+      "options": ["moteur", "résistant", "nul"],
+      "bonnes_reponses": [1],
+      "bareme": 1.5,
+      "lecon": "module-2/travail-d-une-force"
+    },
+    {
+      "type": "qcm",
+      "enonce": "Une mangue de masse 2 kg tombe d'une branche située à 5 m du sol. Le travail de son poids pendant la chute vaut (g = 10 N/kg) :",
+      "options": ["− 100 J", "+ 100 J", "+ 10 J", "+ 1 000 J"],
+      "bonnes_reponses": [1],
+      "bareme": 1.5,
+      "lecon": "module-2/travail-d-une-force"
+    },
+    {
+      "type": "qcm",
+      "enonce": "Le watt (W) est équivalent à :",
+      "options": ["un joule par seconde (J/s)", "un joule par mètre (J/m)", "un newton par seconde (N/s)"],
+      "bonnes_reponses": [0],
+      "bareme": 1.5,
+      "lecon": "module-2/travail-d-une-force"
+    },
+    {
+      "type": "qcm",
+      "enonce": "Un moteur de puissance 1 500 W fonctionne pendant 2 minutes. Le travail qu'il effectue vaut :",
+      "options": ["3 000 J", "750 J", "1,8 × 10⁵ J", "1,8 × 10⁶ J"],
+      "bonnes_reponses": [2],
+      "bareme": 1.5,
+      "lecon": "module-2/travail-d-une-force"
+    },
+    {
+      "type": "qcm",
+      "enonce": "Le kilowattheure (kWh) est une unité :",
+      "options": ["de puissance", "d'énergie", "de force"],
+      "bonnes_reponses": [1],
+      "bareme": 1.5,
+      "lecon": "module-2/travail-d-une-force"
+    },
+    {
+      "type": "libre",
+      "enonce": "À la gare voyageurs de Yaoundé, un élève tire sa valise sur d = 50 m à l'aide d'une sangle faisant un angle de 60° avec l'horizontale. La tension de la sangle vaut T = 40 N. On donne cos 60° = 0,5.\n\n1. Calculer le travail de la tension T⃗ de la sangle sur ce trajet.\n2. Préciser la nature de ce travail (moteur, résistant ou nul) en justifiant.",
+      "corrige_type": "1. W(T⃗) = T × d × cos α = 40 × 50 × cos 60° = 40 × 50 × 0,5 = 1 000 J.\n2. W(T⃗) > 0 car α = 60° < 90° (cos α > 0) : c'est un travail MOTEUR — la tension de la sangle favorise le déplacement de la valise.\n\nDémarche attendue : écrire la formule W = F·d·cos α, remplacer avec les bonnes unités, conclure sur le signe. Accorder la moitié des points de la question 1 si la formule est correcte mais le calcul faux.",
+      "bareme": 4,
+      "lecon": "module-2/travail-d-une-force"
+    },
+    {
+      "type": "libre",
+      "enonce": "Sur un chantier de Douala, une grue soulève une charge de masse m = 800 kg jusqu'à une hauteur h = 25 m, à vitesse constante, en une durée t = 40 s. On prend g = 10 N/kg.\n\n1. Calculer le travail du poids de la charge pendant la montée.\n2. En déduire le travail fourni par la grue (on admet qu'il est opposé au travail du poids).\n3. Calculer la puissance moyenne développée par la grue.",
+      "corrige_type": "1. La charge monte : le travail du poids est résistant.\nW(P⃗) = − m g h = − 800 × 10 × 25 = − 200 000 J = − 2 × 10⁵ J.\n2. Le travail fourni par la grue est opposé : W(grue) = + 2 × 10⁵ J.\n3. P = W / t = 200 000 / 40 = 5 000 W = 5 kW.\n\nDémarche attendue : signe négatif justifié à la montée (question 1), utilisation de P = W/t avec le temps en secondes (question 3). Une erreur de signe en 1 mais une démarche cohérente ensuite ne doit pas faire perdre les points des questions 2 et 3 (notation par report).",
+      "bareme": 4,
+      "lecon": "module-2/travail-d-une-force"
+    }
+  ]
+}
