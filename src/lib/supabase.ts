@@ -8,10 +8,19 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+// URL et clé anon du projet : valeurs PUBLIQUES par nature (la clé anon est
+// livrée à chaque navigateur et protégée par la RLS). Les variables d'env,
+// quand elles sont définies, ont la priorité — ces valeurs de repli garantissent
+// simplement que le build fonctionne partout. Les clés SECRÈTES (service_role,
+// Anthropic) ne sont jamais ici : voir sbAdmin() et lib/grading.ts.
+const URL_PUBLIQUE = 'https://xjzthitjhplgrsfdaial.supabase.co';
+const ANON_PUBLIQUE =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhqenRoaXRqaHBsZ3JzZmRhaWFsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ2ODc5NjYsImV4cCI6MjEwMDI2Mzk2Nn0.svEUmQB2DNWa2K5TVt-7BYsFq8jz6hHuwnPQ5hek0VY';
+
+const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? URL_PUBLIQUE;
 
 export function sbPublic() {
-  return createClient(url, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+  return createClient(url, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? ANON_PUBLIQUE, {
     auth: { persistSession: false },
   });
 }
