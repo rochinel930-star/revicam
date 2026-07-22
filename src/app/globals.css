@@ -1,26 +1,143 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Marque */
+  --color-navy: #1a237e;
+  --color-navy-mid: #283593;
+  --color-gold: #d4af37;
+  --color-gold-bg: #fef9e7;
+
+  /* Matières */
+  --color-physique: #e8524a;
+  --color-physique-bg: #fdedec;
+  --color-svteehb: #00c896;
+  --color-svteehb-bg: #eafaf1;
+  --color-maths: #4a9ee8;
+  --color-maths-bg: #ebf5fb;
+  --color-chimie: #9b59b6;
+
+  /* Police système uniquement — zéro webfont. */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  color: #1e293b;
+  background: #f8fafc;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ── Contenu de cours rendu côté serveur (HTML de lib/markdown.ts) ── */
+.prose {
+  font-size: 1rem;
+  line-height: 1.7;
+  overflow-wrap: break-word;
+  overflow-x: auto;
+}
+.prose h3 {
+  color: var(--color-navy);
+  font-weight: 700;
+  font-size: 1.125rem;
+  margin: 1.5em 0 0.5em;
+}
+.prose h4 {
+  font-weight: 700;
+  margin: 1.25em 0 0.5em;
+}
+.prose p {
+  margin: 0.75em 0;
+}
+.prose ul,
+.prose ol {
+  margin: 0.75em 0;
+  padding-left: 1.5em;
+}
+.prose ul {
+  list-style: disc;
+}
+.prose ol {
+  list-style: decimal;
+}
+.prose li {
+  margin: 0.3em 0;
+}
+.prose table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  width: 100%;
+  font-size: 0.925rem;
+}
+.prose th,
+.prose td {
+  border: 1px solid #cbd5e1;
+  padding: 0.45em 0.6em;
+  text-align: left;
+}
+.prose th {
+  background: var(--color-maths-bg);
+  color: var(--color-navy);
+}
+.prose svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em auto;
+}
+
+/* ── Encadrés pédagogiques ── */
+.box {
+  border-radius: 0.5rem;
+  padding: 0.9rem 1rem;
+  margin: 1.25em 0;
+  border: 1px solid;
+}
+.box .box-title {
+  font-weight: 700;
+  margin: 0 0 0.4em;
+  font-size: 0.95rem;
+}
+.box p:last-child {
+  margin-bottom: 0;
+}
+.box-formule {
+  background: var(--color-maths-bg);
+  border-color: var(--color-navy);
+}
+.box-formule .box-title {
+  color: var(--color-navy);
+}
+.box-definition {
+  background: var(--color-svteehb-bg);
+  border-color: var(--color-svteehb);
+}
+.box-definition .box-title {
+  color: #047857;
+}
+.box-exemple {
+  background: var(--color-gold-bg);
+  border-color: var(--color-gold);
+}
+.box-exemple .box-title {
+  color: #92400e;
+}
+
+/* ── Impression de la fiche « Essentiel » (bouton Télécharger la fiche PDF) ── */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .fiche-print,
+  .fiche-print * {
+    visibility: visible;
+  }
+  .fiche-print {
+    position: absolute;
+    inset: 0;
+    background: white !important;
+    border: none !important;
+  }
 }
