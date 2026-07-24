@@ -49,10 +49,14 @@ export async function getModules(classeId: string, matiereId: string): Promise<M
 }
 
 /** Toutes les leçons d'une liste de modules (métadonnées seulement). */
+// Lectures publiques des leçons via la VUE `lecons_public` : elle expose
+// toujours les métadonnées mais masque le contenu (contenu_mdx, essentiel,
+// jeu_bilingue, qcm, exercices) tant que publie=false. Les brouillons ne
+// fuitent donc jamais leur contenu, tout en restant listables « à venir ».
 export async function getLeconsDesModules(moduleIds: string[]): Promise<Lecon[]> {
   if (moduleIds.length === 0) return [];
   const { data, error } = await sbPublic()
-    .from('lecons')
+    .from('lecons_public')
     .select('id, module_id, numero, titre, slug, duree_lecture_min, objectifs, publie')
     .in('module_id', moduleIds)
     .order('numero');
@@ -62,7 +66,7 @@ export async function getLeconsDesModules(moduleIds: string[]): Promise<Lecon[]>
 
 export async function getLecon(moduleId: string, slug: string): Promise<Lecon | null> {
   const { data } = await sbPublic()
-    .from('lecons')
+    .from('lecons_public')
     .select('*')
     .eq('module_id', moduleId)
     .eq('slug', slug)
