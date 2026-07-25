@@ -108,7 +108,53 @@ attendre('vide → chaîne vide', mdToHtml('') === '');
   attendre('sécu : MathML (KaTeX R1) préservé', /<math/.test(h) && /<mi>x<\/mi>/.test(h), h);
 }
 
-// ── 8. Rapport ───────────────────────────────────────────────────────
+// ── 8. Maths & chimie : moteur scientifique (R1 — KaTeX → MathML) ────
+{
+  const h = mdToHtml('La relation $E=mc^2$ est célèbre.');
+  attendre('maths : inline → <math> + <msup>, plus de $', /<math/.test(h) && /<msup>/.test(h) && !/\$/.test(h), h);
+}
+{
+  // Display : les $$ doivent être sur leurs propres lignes (convention remark-math).
+  const h = mdToHtml('$$\n\\int_0^1 x^2\\,dx\n$$');
+  attendre('maths : display ($$ multi-lignes) → display="block"', /<math[^>]*display="block"/.test(h), h);
+}
+{
+  const h = mdToHtml('$\\dfrac{a}{b}$');
+  attendre('maths : fraction → <mfrac>', /<mfrac>/.test(h), h);
+}
+{
+  const h = mdToHtml('$\\sqrt{x+1}$');
+  attendre('maths : racine → <msqrt>', /<msqrt>/.test(h), h);
+}
+{
+  const h = mdToHtml('$\\begin{pmatrix} 1 & 0 \\\\ 0 & 1 \\end{pmatrix}$');
+  attendre('maths : matrice → <mtable>', /<mtable[\s>]/.test(h), h);
+}
+{
+  const h = mdToHtml('$$\\begin{cases} x+y=1 \\\\ x-y=0 \\end{cases}$$');
+  attendre('maths : système → <mtable>', /<mtable[\s>]/.test(h), h);
+}
+{
+  const h = mdToHtml('$\\ce{2H2 + O2 -> 2H2O}$');
+  attendre('chimie : mhchem \\ce{} → <math>', /<math/.test(h) && /<mn>2<\/mn>/.test(h), h);
+}
+// Interaction KaTeX + sanitize : maths rendues ET charge hostile neutralisée.
+{
+  const h = mdToHtml('Formule $a^2+b^2$ puis <script>alert(1)</script>.');
+  attendre('maths+sécu : <math> présent ET <script> supprimé', /<math/.test(h) && !/<script/i.test(h), h);
+}
+// Aucun faux positif : un texte sans $ ne produit aucun <math>.
+{
+  const h = mdToHtml('Le prix est de 5000 FCFA, aucune formule ici.');
+  attendre('maths : aucun faux positif (pas de <math> sans $)', !/<math/.test(h), h);
+}
+// Sortie MathML pure : aucune webfont/CSS KaTeX requise.
+{
+  const h = mdToHtml('$$\\frac{-b\\pm\\sqrt{\\Delta}}{2a}$$');
+  attendre('maths : MathML pur (aucune classe katex-html)', /<math/.test(h) && !/katex-html/.test(h), h);
+}
+
+// ── 9. Rapport ───────────────────────────────────────────────────────
 let echecs = 0;
 for (const c of checks) {
   if (c.ok) {

@@ -1,4 +1,5 @@
-// Schéma d'assainissement du pipeline de rendu (R2 — défense en profondeur).
+// Schéma d'assainissement du pipeline de rendu (R2 — défense en profondeur ;
+// étendu en R1 pour la sortie MathML de KaTeX).
 //
 // Principe : liste blanche stricte étendant `defaultSchema` de rehype-sanitize.
 // Tout ce qui n'est pas explicitement autorisé est retiré. On part du socle
@@ -8,8 +9,9 @@
 //   2. le SVG éditorial       : formes statiques réellement utilisées par les
 //                               leçons (svg/line/rect/polygon/path/text…),
 //                               attributs de présentation seulement.
-//   3. MathML (compatibilité KaTeX, R1) : KaTeX sera configuré en sortie
-//                               MathML, qui ne requiert AUCUN style inline.
+//   3. MathML (sortie KaTeX, R1) : éléments + attributs de PRÉSENTATION MathML.
+//                               KaTeX est configuré en sortie MathML, qui ne
+//                               requiert AUCUN style inline ni webfont.
 //
 // Volontairement ABSENTS (donc supprimés) : script, iframe, object, embed,
 // foreignObject, use, a dans SVG, tous les gestionnaires on* (non listés donc
@@ -17,9 +19,13 @@
 // et « styles dangereux » ⇒ on bloque `style` entièrement), les protocoles
 // dangereux (javascript:/data: hors socle sûr).
 //
+// Sûreté MathML : les attributs MathML sont purement présentationnels (couleur,
+// alignement, tailles) et NON exécutables ; ils ne sont autorisés que sur les
+// éléments MathML. Aucun n'accepte d'URL ni de script.
+//
 // Noms d'attributs = propriétés hast (camelCase pour le SVG multi-mots :
 // strokeWidth, viewBox, fontSize…). Conformité vérifiée empiriquement sur le
-// contenu réel (aucune régression sur les leçons publiées).
+// contenu réel et sur la sortie KaTeX (aucune régression, maths intactes).
 
 import { defaultSchema } from 'rehype-sanitize';
 
@@ -30,7 +36,7 @@ const SVG_TAGS = [
   'polygon', 'polyline', 'path', 'text', 'tspan', 'title', 'desc',
 ];
 
-// Éléments MathML émis par KaTeX (sortie MathML) — pour R1.
+// Éléments MathML émis par KaTeX (sortie MathML).
 const MATHML_TAGS = [
   'math', 'semantics', 'annotation', 'mrow', 'mi', 'mo', 'mn', 'ms',
   'mtext', 'mspace', 'msup', 'msub', 'msubsup', 'mfrac', 'msqrt', 'mroot',
@@ -43,6 +49,22 @@ const SVG_PRESENTATION = [
   'fill', 'stroke', 'strokeWidth', 'strokeDashArray', 'strokeLinecap',
   'strokeLinejoin', 'transform', 'opacity', 'fillOpacity', 'strokeOpacity',
 ];
+
+// Attributs de présentation MathML autorisés (non exécutables, MathML seul).
+const MATHML_ATTRS = [
+  'displaystyle', 'scriptlevel', 'mathvariant', 'mathcolor', 'mathbackground', 'mathsize',
+  'columnalign', 'columnspacing', 'columnlines', 'columnspan',
+  'rowalign', 'rowspacing', 'rowlines', 'rowspan',
+  'frame', 'framespacing',
+  'accent', 'accentunder', 'stretchy', 'fence', 'separator', 'form', 'largeop',
+  'movablelimits', 'symmetric', 'maxsize', 'minsize', 'lspace', 'rspace', 'voffset',
+  'width', 'height', 'depth', 'linethickness', 'notation', 'dir',
+  'xmlns', 'display', 'encoding',
+];
+
+// { math: MATHML_ATTRS, mrow: MATHML_ATTRS, … } — même liste sûre pour chaque
+// élément MathML.
+const mathmlAttributes = Object.fromEntries(MATHML_TAGS.map((t) => [t, MATHML_ATTRS]));
 
 const base = defaultSchema;
 
@@ -80,12 +102,7 @@ export const revicamSchema = {
     text: ['x', 'y', 'dx', 'dy', 'fontSize', 'fontWeight', 'fontFamily', 'textAnchor', ...SVG_PRESENTATION],
     tspan: ['x', 'y', 'dx', 'dy', 'fontSize', 'fontWeight', 'textAnchor', ...SVG_PRESENTATION],
 
-    // ── MathML (KaTeX, R1) ──────────────────────────────────────────
-    math: ['xmlns', 'display'],
-    annotation: ['encoding'],
-    mo: ['stretchy', 'fence', 'separator', 'form', 'largeop', 'movablelimits', 'accent', 'lspace', 'rspace'],
-    mspace: ['width', 'height', 'depth'],
-    mpadded: ['width', 'height', 'depth', 'lspace', 'voffset'],
-    menclose: ['notation'],
+    // ── MathML (sortie KaTeX, R1) — attributs de présentation ───────
+    ...mathmlAttributes,
   },
 };
