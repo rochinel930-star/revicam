@@ -7,15 +7,21 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "import": "tsx scripts/import/index.ts"
+    "import": "tsx scripts/import/index.ts",
+    "render:check": "tsx scripts/render-check.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",
     "@supabase/supabase-js": "^2.110.8",
-    "marked": "^18.0.7",
     "next": "16.2.11",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "rehype-raw": "^7.0.0",
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "unified": "^11.0.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

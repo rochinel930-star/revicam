@@ -7,9 +7,7 @@
 //   :::exemple Titre     → encadré exemple résolu
 // Le SVG inline et les tableaux markdown passent tels quels.
 
-import { marked } from 'marked';
-
-marked.setOptions({ gfm: true, breaks: false });
+import { markdownToHtml } from './render/processor';
 
 const BOX_LABELS: Record<string, string> = {
   formule: 'Formule',
@@ -22,7 +20,7 @@ function renderBoxes(src: string): string {
     /^:::(formule|definition|exemple)[ \t]*([^\n]*)\n([\s\S]*?)^:::[ \t]*$/gm,
     (_m, type: string, titre: string, corps: string) => {
       const label = titre.trim() || BOX_LABELS[type];
-      const inner = marked.parse(corps.trim(), { async: false }) as string;
+      const inner = markdownToHtml(corps.trim());
       return `<div class="box box-${type}"><p class="box-title">${label}</p>${inner}</div>`;
     }
   );
@@ -32,6 +30,6 @@ function renderBoxes(src: string): string {
 export function mdToHtml(src: string | null | undefined): string {
   if (!src) return '';
   const withBoxes = renderBoxes(src);
-  // Les <div class="box"> déjà rendus sont du HTML brut : marked les laisse passer.
-  return marked.parse(withBoxes, { async: false }) as string;
+  // Les <div class="box"> déjà rendus sont du HTML brut : le pipeline les laisse passer.
+  return markdownToHtml(withBoxes);
 }
