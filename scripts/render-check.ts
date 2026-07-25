@@ -67,7 +67,48 @@ attendre('vide → chaîne vide', mdToHtml('') === '');
   attendre('svg : enfant <line> préservé', /<line[\s>]/.test(h), h);
 }
 
-// ── 7. Rapport ───────────────────────────────────────────────────────
+// ── 7. Sécurité : assainissement R2 (défense en profondeur) ──────────
+{
+  const h = mdToHtml('Bonjour <script>alert(1)</script> fin.');
+  attendre('sécu : <script> et son contenu supprimés', !/<script/i.test(h) && !/alert\(1\)/.test(h), h);
+}
+{
+  const h = mdToHtml('<img src=x onerror="alert(1)">');
+  attendre('sécu : gestionnaire onerror supprimé', !/onerror/i.test(h), h);
+}
+{
+  const h = mdToHtml('[clique](javascript:alert(1))');
+  attendre('sécu : protocole javascript: supprimé', !/javascript:/i.test(h), h);
+}
+{
+  const h = mdToHtml('<svg onload="alert(1)"><line x1="0" y1="0" x2="9" y2="9" stroke="red"/></svg>');
+  attendre('sécu : SVG malveillant neutralisé (onload retiré, svg conservé)', !/onload/i.test(h) && /<svg/.test(h) && /<line/.test(h), h);
+}
+{
+  const h = mdToHtml('<svg><foreignObject><iframe src="javascript:alert(1)"></iframe></foreignObject></svg>');
+  attendre('sécu : foreignObject + iframe supprimés', !/foreignObject/i.test(h) && !/<iframe/i.test(h), h);
+}
+{
+  const h = mdToHtml('<div style="background:url(javascript:alert(1))">x</div>');
+  attendre('sécu : style inline supprimé', !/style=/i.test(h), h);
+}
+{
+  const h = mdToHtml('<object data="x"></object><embed src="y">');
+  attendre('sécu : object/embed supprimés', !/<object|<embed/i.test(h), h);
+}
+// HTML autorisé : le SVG éditorial légitime traverse intact.
+{
+  const src = '<svg viewBox="0 0 10 10" role="img"><line x1="0" y1="0" x2="9" y2="9" stroke="#1A237E" stroke-width="2" stroke-dasharray="none"/></svg>';
+  const h = mdToHtml(src);
+  attendre('sécu : SVG éditorial préservé', /<svg/.test(h) && /<line/.test(h) && /stroke-dasharray="none"/.test(h), h);
+}
+// Compatibilité KaTeX (R1) : la sortie MathML traverse l'assainissement.
+{
+  const h = mdToHtml('<math xmlns="http://www.w3.org/1998/Math/MathML"><mrow><mi>x</mi><mo>=</mo><mn>2</mn></mrow></math>');
+  attendre('sécu : MathML (KaTeX R1) préservé', /<math/.test(h) && /<mi>x<\/mi>/.test(h), h);
+}
+
+// ── 8. Rapport ───────────────────────────────────────────────────────
 let echecs = 0;
 for (const c of checks) {
   if (c.ok) {
