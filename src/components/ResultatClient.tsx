@@ -49,7 +49,6 @@ export default function ResultatClient({ attemptId }: { attemptId: string }) {
   }
 
   const { attempt, composition, questions, diagnostic } = data;
-  const partielle = attempt.statut === 'correction_partielle';
   const sousTotal = questions.reduce((s, q) => s + (q.note ?? 0), 0);
   const note20 = attempt.note_finale !== null
     ? (attempt.note_finale * 20) / composition.bareme_total

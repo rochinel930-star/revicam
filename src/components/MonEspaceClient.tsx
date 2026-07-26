@@ -3,19 +3,15 @@
 // Mon espace : progression des leçons + historique des compositions,
 // à partir du localStorage (aucun compte requis).
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getProgress, getHistorique, type ProgressLecon, type HistoriqueAttempt } from '@/lib/local';
 import { couleurNote } from '@/lib/config';
+import { useMounted } from '@/lib/use-mounted';
 
 export default function MonEspaceClient() {
-  const [progress, setProgress] = useState<Record<string, ProgressLecon> | null>(null);
-  const [historique, setHistorique] = useState<HistoriqueAttempt[]>([]);
-
-  useEffect(() => {
-    setProgress(getProgress());
-    setHistorique(getHistorique());
-  }, []);
+  const mounted = useMounted();
+  const progress: Record<string, ProgressLecon> | null = mounted ? getProgress() : null;
+  const historique: HistoriqueAttempt[] = mounted ? getHistorique() : [];
 
   if (progress === null) {
     return <p className="p-6 text-center text-sm text-slate-500">Chargement…</p>;

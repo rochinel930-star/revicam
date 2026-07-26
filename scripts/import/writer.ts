@@ -115,16 +115,6 @@ export class SupabaseWriter implements Writer {
     return data.id;
   }
 
-  private async upsert(
-    table: string, fichier: string,
-    rows: Record<string, unknown>[], onConflict: string,
-    existsFilter: (q: ReturnType<SupabaseClient['from']>['select'] extends never ? never : any) => any
-  ): Promise<void> {
-    void existsFilter;
-    const { error } = await this.sb.from(table).upsert(rows, { onConflict });
-    if (error) this.fail(fichier, `Upsert ${table} : ${error.message}`);
-  }
-
   async importStructure(s: StructureImport): Promise<void> {
     const f = 'content/structure.json';
     for (const c of s.classes) {
@@ -132,14 +122,14 @@ export class SupabaseWriter implements Writer {
       const { error } = await this.sb.from('classes').upsert(
         { slug: c.slug, nom: c.nom, ordre: c.ordre }, { onConflict: 'slug' });
       if (error) this.fail(f, `classes : ${error.message}`);
-      data ? this.maj++ : this.crees++;
+      if (data) this.maj++; else this.crees++;
     }
     for (const m of s.matieres) {
       const { data } = await this.sb.from('matieres').select('id').eq('slug', m.slug).maybeSingle();
       const { error } = await this.sb.from('matieres').upsert(
         { slug: m.slug, nom: m.nom, couleur_hex: m.couleur, icone: m.icone ?? null }, { onConflict: 'slug' });
       if (error) this.fail(f, `matieres : ${error.message}`);
-      data ? this.maj++ : this.crees++;
+      if (data) this.maj++; else this.crees++;
     }
     for (const cm of s.classe_matieres) {
       const row = {
@@ -161,7 +151,7 @@ export class SupabaseWriter implements Writer {
         .eq('classe_id', row.classe_id).eq('matiere_id', row.matiere_id).eq('numero', row.numero).maybeSingle();
       const { error } = await this.sb.from('modules').upsert(row, { onConflict: 'classe_id,matiere_id,numero' });
       if (error) this.fail(f, `modules : ${error.message}`);
-      data ? this.maj++ : this.crees++;
+      if (data) this.maj++; else this.crees++;
     }
   }
 
@@ -184,7 +174,7 @@ export class SupabaseWriter implements Writer {
     const { data } = await this.sb.from('lecons').select('id').eq('module_id', moduleId).eq('numero', l.numero).maybeSingle();
     const { error } = await this.sb.from('lecons').upsert(row, { onConflict: 'module_id,numero' });
     if (error) this.fail(l.fichier, `Upsert leçon : ${error.message}`);
-    data ? this.maj++ : this.crees++;
+    if (data) this.maj++; else this.crees++;
   }
 
   async importComposition(c: CompositionImport): Promise<void> {
@@ -203,7 +193,7 @@ export class SupabaseWriter implements Writer {
     const { data: comp, error } = await this.sb.from('compositions')
       .upsert(row, { onConflict: 'slug' }).select('id').single();
     if (error || !comp) this.fail(c.fichier, `Upsert composition : ${error?.message}`);
-    existing ? this.maj++ : this.crees++;
+    if (existing) this.maj++; else this.crees++;
 
     const qRows = [];
     for (let i = 0; i < c.questions.length; i++) {
@@ -258,7 +248,7 @@ export class SupabaseWriter implements Writer {
     const { data: ep, error } = await this.sb.from('epreuves')
       .upsert(row, { onConflict: 'classe_id,matiere_id,type,annee,titre' }).select('id').single();
     if (error || !ep) this.fail(e.fichier, `Upsert épreuve : ${error?.message}`);
-    existing ? this.maj++ : this.crees++;
+    if (existing) this.maj++; else this.crees++;
 
     // Liens épreuve ↔ leçons (remplacés à chaque import).
     await this.sb.from('epreuve_lecons').delete().eq('epreuve_id', ep.id);

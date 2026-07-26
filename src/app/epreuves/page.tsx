@@ -34,6 +34,19 @@ function urlAvec(filtres: Filtres, patch: Partial<Filtres>): string {
   return qs ? `/epreuves?${qs}` : '/epreuves';
 }
 
+function Chip({ actif, href, children }: { actif: boolean; href: string; children: React.ReactNode }) {
+  return (
+    <Link
+      href={href}
+      className={`inline-block rounded-full border px-3 py-1 text-xs font-medium transition ${
+        actif ? 'border-navy bg-navy text-white' : 'border-slate-300 bg-white text-slate-600 hover:border-navy'
+      }`}
+    >
+      {children}
+    </Link>
+  );
+}
+
 export default async function PageEpreuves({
   searchParams,
 }: {
@@ -64,17 +77,6 @@ export default async function PageEpreuves({
 
   const annees = [...new Set(epreuves.map((e) => e.annee))].sort((a, b) => b - a);
   const anneesChoix = annees.length > 0 ? annees : [new Date().getFullYear()];
-
-  const Chip = ({ actif, href, children }: { actif: boolean; href: string; children: React.ReactNode }) => (
-    <Link
-      href={href}
-      className={`inline-block rounded-full border px-3 py-1 text-xs font-medium transition ${
-        actif ? 'border-navy bg-navy text-white' : 'border-slate-300 bg-white text-slate-600 hover:border-navy'
-      }`}
-    >
-      {children}
-    </Link>
-  );
 
   return (
     <div>

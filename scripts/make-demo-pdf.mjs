@@ -1,7 +1,10 @@
 // Génère les PDF factices de démonstration dans /public/epreuves-demo/.
-// Usage : node scripts/make-demo-pdf.js
-const fs = require('node:fs');
-const path = require('node:path');
+// Usage : node scripts/make-demo-pdf.mjs
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function makePdf(lines) {
   const content =

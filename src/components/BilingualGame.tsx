@@ -20,6 +20,10 @@ function melanger<T>(arr: T[]): T[] {
 
 export default function BilingualGame({ paires }: Props) {
   const [cle, setCle] = useState(0);
+  // `cle` est une dépendance VOLONTAIRE : l'incrémenter (setCle, bouton « Rejouer »)
+  // force useMemo à re-mélanger les paires. eslint-plugin-react-hooks la signale
+  // comme « inutile » (non lue dans le corps du memo) — avertissement CONSERVÉ
+  // sciemment : la retirer casserait le re-mélange. Ne pas « corriger ».
   const enMelanges = useMemo(() => melanger(paires.map((p) => p.en)), [paires, cle]);
   const [selFr, setSelFr] = useState<string | null>(null);
   const [trouves, setTrouves] = useState<Set<string>>(new Set());

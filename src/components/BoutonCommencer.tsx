@@ -3,19 +3,17 @@
 // Bouton « COMMENCER LA COMPOSITION » : crée la tentative côté serveur puis
 // entre en salle. Reprend une tentative en cours si une existe (coupure).
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getAnonId, getAttemptEnCours, setAttemptEnCours } from '@/lib/local';
+import { useMounted } from '@/lib/use-mounted';
 
 export default function BoutonCommencer({ compositionId }: { compositionId: string }) {
   const router = useRouter();
+  const mounted = useMounted();
   const [chargement, setChargement] = useState(false);
   const [erreur, setErreur] = useState<string | null>(null);
-  const [reprise, setReprise] = useState(false);
-
-  useEffect(() => {
-    setReprise(Boolean(getAttemptEnCours(compositionId)));
-  }, [compositionId]);
+  const reprise = mounted ? Boolean(getAttemptEnCours(compositionId)) : false;
 
   async function commencer() {
     setChargement(true);

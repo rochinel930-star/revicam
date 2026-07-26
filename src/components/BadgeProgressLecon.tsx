@@ -2,14 +2,12 @@
 
 // Petit badge d'état d'une leçon dans les listes (depuis le localStorage).
 
-import { useEffect, useState } from 'react';
 import { getProgress, type ProgressLecon } from '@/lib/local';
+import { useMounted } from '@/lib/use-mounted';
 
 export default function BadgeProgressLecon({ leconId }: { leconId: string }) {
-  const [p, setP] = useState<ProgressLecon | null>(null);
-  useEffect(() => {
-    setP(getProgress()[leconId] ?? null);
-  }, [leconId]);
+  const mounted = useMounted();
+  const p: ProgressLecon | null = mounted ? getProgress()[leconId] ?? null : null;
   if (!p) return null;
   if (p.statut === 'terminee')
     return <span className="text-xs font-medium text-green-700">✓ terminée{p.meilleur_score_qcm !== null ? ` · ${p.meilleur_score_qcm}/20` : ''}</span>;

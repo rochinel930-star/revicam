@@ -3,8 +3,8 @@
 // Barre de progression d'une matière, calculée depuis le localStorage
 // (leçons au statut qcm_fait ou terminee parmi les leçons publiées).
 
-import { useEffect, useState } from 'react';
 import { getProgress } from '@/lib/local';
+import { useMounted } from '@/lib/use-mounted';
 
 export default function ProgressionMatiere({
   leconIds,
@@ -13,20 +13,17 @@ export default function ProgressionMatiere({
   leconIds: string[];
   couleur: string;
 }) {
-  const [pct, setPct] = useState<number | null>(null);
+  const mounted = useMounted();
 
-  useEffect(() => {
-    if (leconIds.length === 0) {
-      setPct(null);
-      return;
-    }
+  let pct: number | null = null;
+  if (mounted && leconIds.length > 0) {
     const progress = getProgress();
     const faites = leconIds.filter((id) => {
       const p = progress[id];
       return p && (p.statut === 'qcm_fait' || p.statut === 'terminee');
     }).length;
-    setPct(Math.round((faites / leconIds.length) * 100));
-  }, [leconIds]);
+    pct = Math.round((faites / leconIds.length) * 100);
+  }
 
   if (pct === null) return null;
   return (

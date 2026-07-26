@@ -2,8 +2,6 @@
 import matter from 'gray-matter';
 import type { LeconImport, QcmItem, Exercice, ImportError } from './types';
 
-const SECTIONS = ['Cours', 'Essentiel', 'JeuBilingue', 'QCM', 'Exercices'] as const;
-
 /** Découpe le corps en sections `## Nom` connues. */
 function splitSections(body: string): Map<string, string> {
   const map = new Map<string, string>();

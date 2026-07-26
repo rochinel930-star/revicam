@@ -53,7 +53,9 @@ export default function SessionClient({ composition, questions }: Props) {
   const [erreur, setErreur] = useState<string | null>(null);
   const dirty = useRef(false);
   const reponsesRef = useRef(reponses);
-  reponsesRef.current = reponses;
+  useEffect(() => {
+    reponsesRef.current = reponses;
+  });
 
   // ── Initialisation : tentative + chrono + brouillon ───────────────
   useEffect(() => {
