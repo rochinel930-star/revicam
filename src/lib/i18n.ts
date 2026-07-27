@@ -16,6 +16,22 @@ const DICT = {
   },
   'offline.retry': { fr: 'Réessayer', en: 'Retry' },
   'offline.home': { fr: 'Accueil', en: 'Home' },
+  'auth.title': { fr: 'Se connecter', en: 'Sign in' },
+  'auth.body': {
+    fr: 'Reçois un lien de connexion par e-mail. Pas de mot de passe. Ta progression anonyme sera conservée.',
+    en: 'Get a sign-in link by email. No password. Your anonymous progress is kept.',
+  },
+  'auth.email': { fr: 'Ton adresse e-mail', en: 'Your email address' },
+  'auth.send': { fr: 'Recevoir le lien', en: 'Send the link' },
+  'auth.sending': { fr: 'Envoi…', en: 'Sending…' },
+  'auth.sent': {
+    fr: 'Lien envoyé ! Ouvre ta boîte mail pour te connecter.',
+    en: 'Link sent! Check your inbox to sign in.',
+  },
+  'auth.error': {
+    fr: 'Envoi impossible. Vérifie l’adresse et réessaie.',
+    en: 'Could not send. Check the address and try again.',
+  },
 } as const;
 
 export type MessageKey = keyof typeof DICT;

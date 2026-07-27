@@ -3,6 +3,7 @@ import './globals.css';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
 import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
+import AuthSync from '@/components/AuthSync';
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from '@/lib/config';
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         </main>
         <BottomNav />
         <ServiceWorkerRegister />
+        <AuthSync />
       </body>
     </html>
   );
