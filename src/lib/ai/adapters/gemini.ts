@@ -70,6 +70,40 @@ export async function appelJsonGemini(
   throw derniere ?? new Error('appelJsonGemini : aucun modèle disponible dans la chaîne');
 }
 
+/**
+ * Appel VISION en JSON (document image/PDF encodé base64) avec repli de modèle.
+ * Utilisé pour lire l'en-tête d'une épreuve scannée. On n'envoie qu'UN document
+ * (page/en-tête) pour minimiser le coût.
+ */
+export async function appelVisionJsonGemini(
+  base64: string,
+  mimeType: string,
+  instruction: string,
+  chaine: string[] = CHAINE_ECO,
+  temperature = 0.1
+): Promise<ReponseGeneration> {
+  let derniere: unknown;
+  for (const model of chaine) {
+    try {
+      const res = await client().models.generateContent({
+        model,
+        contents: [{ role: 'user', parts: [{ inlineData: { mimeType, data: base64 } }, { text: instruction }] }],
+        config: { responseMimeType: 'application/json', temperature },
+      });
+      return {
+        contenu: parseJson(res.text ?? ''),
+        cout_tokens: res.usageMetadata?.totalTokenCount ?? 0,
+        modele: model,
+      };
+    } catch (e) {
+      derniere = e;
+      if (RE_REPLI.test(String((e as Error)?.message ?? e))) continue;
+      throw e;
+    }
+  }
+  throw derniere ?? new Error('appelVisionJsonGemini : aucun modèle disponible');
+}
+
 export function creerGeminiAdapter(): LlmAdapter {
   return {
     nom: 'gemini',

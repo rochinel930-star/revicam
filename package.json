@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "import": "tsx scripts/import/index.ts",
     "generate": "tsx scripts/generate-artifacts.ts",
+    "ingest:epreuves": "tsx scripts/ingest-epreuves.ts",
     "render:check": "tsx scripts/render-check.ts"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     "@supabase/supabase-js": "^2.110.8",
     "katex": "^0.18.1",
     "next": "16.2.11",
+    "pdf-parse": "^2.4.5",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "rehype-katex": "^7.0.1",
