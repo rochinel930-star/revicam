@@ -1,10 +1,83 @@
 // Types des données publiques (miroir du schéma Supabase).
 
+// ── Référentiel Données V2 (Phase P2) ───────────────────────────────
+// Ajouts additifs : les entités du référentiel configurable 6e→Terminale
+// et multi-pays. Les colonnes de rattachement sur les entités existantes
+// (programme_id, niveau_id, serie_id, chapitre_id…) sont optionnelles pour
+// préserver la rétro-compatibilité avec les lignes/inserts antérieurs.
+
+export interface Pays {
+  id: string;
+  code: string;
+  nom: string;
+}
+
+export interface Programme {
+  id: string;
+  pays_id: string;
+  code: string;
+  nom: string;
+  config: Record<string, unknown>;
+}
+
+export interface Niveau {
+  id: string;
+  programme_id: string;
+  code: string;
+  nom: string;
+  cycle: string | null;
+  ordre: number;
+}
+
+export interface Serie {
+  id: string;
+  programme_id: string;
+  code: string;
+  nom: string;
+}
+
+export interface Sequence {
+  id: string;
+  programme_id: string;
+  numero: number;
+  nom: string;
+}
+
+/** Vue canonique `chapitre` (foyer physique : table `modules`). */
+export interface Chapitre {
+  id: string;
+  programme_id: string | null;
+  classe_id: string;
+  matiere_id: string;
+  sequence_id: string | null;
+  numero: number;
+  titre: string;
+}
+
+export type StatutVersion = 'brouillon' | 'publie' | 'archive';
+
+export interface ContentVersion {
+  id: string;
+  entity_type: 'lecon';
+  entity_id: string;
+  version: number;
+  content_hash: string;
+  parent_version_id: string | null;
+  statut: StatutVersion;
+  snapshot: Record<string, unknown>;
+  provenance: Record<string, unknown>;
+  created_at: string;
+}
+
 export interface Classe {
   id: string;
   slug: string;
   nom: string;
   ordre: number;
+  // Rattachement V2 (nullable tant que non backfillé).
+  programme_id?: string | null;
+  niveau_id?: string | null;
+  serie_id?: string | null;
 }
 
 export interface Matiere {
@@ -21,6 +94,9 @@ export interface Module {
   classe_id: string;
   numero: number;
   titre: string;
+  // Rattachement V2 (nullable tant que non backfillé).
+  programme_id?: string | null;
+  sequence_id?: string | null;
 }
 
 export interface QcmItem {
@@ -52,11 +128,22 @@ export interface Lecon {
   publie: boolean;
 }
 
+export type TypeEpreuve =
+  | 'sequentielle'
+  | 'composition'
+  | 'blanc'
+  | 'officiel'
+  | 'controle'
+  | 'bepc'
+  | 'probatoire'
+  | 'baccalaureat'
+  | 'cep';
+
 export interface Epreuve {
   id: string;
   classe_id: string;
   matiere_id: string;
-  type: 'sequentielle' | 'composition' | 'blanc' | 'officiel' | 'controle';
+  type: TypeEpreuve;
   numero_sequence: number | null;
   annee: number;
   serie: string | null;
@@ -64,6 +151,10 @@ export interface Epreuve {
   titre: string;
   pdf_url: string | null;
   composable: boolean;
+  // Rattachement V2 (nullable).
+  programme_id?: string | null;
+  serie_id?: string | null;
+  session?: string | null;
 }
 
 export interface Composition {
@@ -77,6 +168,9 @@ export interface Composition {
   bareme_total: number;
   mode_affichage: 'une_par_une' | 'liste';
   publie: boolean;
+  // Rattachement V2 (nullable).
+  programme_id?: string | null;
+  serie_id?: string | null;
 }
 
 /** Question telle que vue par le client : vue questions_public, SANS corrigés. */
@@ -116,10 +210,14 @@ export interface Attempt {
   note_finale: number | null;
 }
 
-export const TYPE_EPREUVE_LABELS: Record<Epreuve['type'], string> = {
+export const TYPE_EPREUVE_LABELS: Record<TypeEpreuve, string> = {
   sequentielle: 'Épreuve séquentielle',
   composition: 'Composition trimestrielle',
   blanc: 'Examen blanc',
   officiel: 'Sujet officiel',
   controle: 'Contrôle',
+  bepc: 'BEPC',
+  probatoire: 'Probatoire',
+  baccalaureat: 'Baccalauréat',
+  cep: 'CEP',
 };
