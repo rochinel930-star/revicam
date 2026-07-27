@@ -67,6 +67,8 @@ Ordre strict, additif. **En production (P0)** : `0001`–`0005` déjà appliqué
 | 0016 | jonctions | P3 | jonctions + vue traversée |
 | 0017 | ingestion_staging | P4 | staging ingestion (secret) |
 | 0018 | lesson_artifact | P8 | artefacts IA + vue publique |
+| 0019 | security_hardening | RC | search_path des fonctions + EXECUTE is_staff restreint |
+| 0020 | is_staff_anon_revoke | RC | is_staff() non appelable par anon (RPC) |
 
 **Validation locale préalable** : la chaîne `0001`→`0018` est exécutée dans un
 Postgres réel en mémoire (PGlite) par `npm test` (tests `tests/db/*`) —
