@@ -5,33 +5,27 @@ import type { Metadata } from 'next';
 import Breadcrumb from '@/components/Breadcrumb';
 import { getEpreuves, getClasses, getMatieres, getCompositionDeLEpreuve } from '@/lib/queries';
 import { TYPE_EPREUVE_LABELS } from '@/lib/types';
+import {
+  construireUrlEpreuves,
+  SERIES_DISPONIBLES,
+  type FiltresEpreuvesUI,
+} from '@/lib/epreuves-filtres';
 
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   title: 'Épreuves — Catalogue',
   description:
-    'Épreuves séquentielles, examens blancs et sujets officiels du Probatoire, à consulter, télécharger ou composer en ligne.',
+    'Épreuves séquentielles, examens blancs et sujets officiels (BEPC, Probatoire, Baccalauréat), à consulter, télécharger ou composer en ligne.',
 };
 
 const TYPES = Object.entries(TYPE_EPREUVE_LABELS);
-const SERIES = ['A', 'C', 'D', 'TI'];
+const SERIES = SERIES_DISPONIBLES;
 
-interface Filtres {
-  classe?: string;
-  matiere?: string;
-  type?: string;
-  annee?: string;
-  serie?: string;
-  etablissement?: string;
-}
+type Filtres = FiltresEpreuvesUI;
 
 function urlAvec(filtres: Filtres, patch: Partial<Filtres>): string {
-  const params = new URLSearchParams();
-  const next = { ...filtres, ...patch };
-  for (const [k, v] of Object.entries(next)) if (v) params.set(k, v);
-  const qs = params.toString();
-  return qs ? `/epreuves?${qs}` : '/epreuves';
+  return construireUrlEpreuves(filtres, patch);
 }
 
 function Chip({ actif, href, children }: { actif: boolean; href: string; children: React.ReactNode }) {
@@ -83,8 +77,8 @@ export default async function PageEpreuves({
       <Breadcrumb miettes={[{ label: 'Épreuves' }]} />
       <h1 className="mb-1 text-2xl font-bold text-navy">📄 Catalogue d’épreuves</h1>
       <p className="mb-4 text-sm text-slate-600">
-        Séquentielles, compositions, examens blancs et sujets officiels. Les épreuves marquées
-        ✍️ se composent en ligne avec correction immédiate.
+        Séquentielles, compositions, examens blancs et sujets officiels — BEPC, Probatoire et
+        Baccalauréat. Les épreuves marquées ✍️ se composent en ligne avec correction immédiate.
       </p>
 
       {/* ── Filtres combinables ── */}
