@@ -54,6 +54,46 @@ export interface Chapitre {
   titre: string;
 }
 
+// ── Graphe de connaissances (Phase P3) ──────────────────────────────
+export interface Notion {
+  id: string;
+  programme_id: string;
+  chapitre_id: string;
+  code: string;
+  nom: string;
+}
+
+export interface Competence {
+  id: string;
+  programme_id: string;
+  code: string;
+  nom: string;
+  domaine: string | null;
+}
+
+export interface ObjectifApc {
+  id: string;
+  programme_id: string;
+  competence_id: string | null;
+  code: string;
+  enonce: string;
+}
+
+/** Ligne de la vue de traversée notion → … → pays. */
+export interface ChaineNotion {
+  notion_id: string;
+  notion_code: string;
+  notion_nom: string;
+  chapitre_id: string;
+  chapitre_titre: string;
+  classe_id: string;
+  classe_slug: string;
+  programme_id: string;
+  programme_code: string;
+  pays_id: string;
+  pays_code: string;
+}
+
 export type StatutVersion = 'brouillon' | 'publie' | 'archive';
 
 export interface ContentVersion {
