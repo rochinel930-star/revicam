@@ -14,15 +14,6 @@ const TARIFS_EUR_PAR_MTOKEN: Record<Palier, number> = {
   premium: 9, // notation de réponse ouverte, composition ciblée
 };
 
-/** Palier utilisé par chaque type d'artefact (génération). */
-export const PALIER_GENERATION: Record<string, Palier> = {
-  qcm: 'bon_marche',
-  flashcards: 'bon_marche',
-  vrai_faux: 'bon_marche',
-  questions_ouvertes: 'bon_marche',
-  explications: 'bon_marche',
-};
-
 /** Plafond indicatif de coût de génération par leçon (tous artefacts). */
 export const BUDGET_LECON_EUR = 0.05;
 

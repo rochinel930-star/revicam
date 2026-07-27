@@ -29,7 +29,3 @@ export function problemesMdx(mdx: string): string[] {
   }
   return problemes;
 }
-
-export function estMdxSain(mdx: string): boolean {
-  return problemesMdx(mdx).length === 0;
-}
