@@ -1,11 +1,13 @@
 // Correction IA des questions à réponse libre — SERVEUR UNIQUEMENT.
-// La clé Anthropic ne quitte jamais le serveur.
+// 100 % Gemini (palier « minimal capable » : CHAINE_CORRECTION), avec repli
+// multi-modèles. La clé GEMINI_API_KEY ne quitte jamais le serveur.
 
-import Anthropic from '@anthropic-ai/sdk';
 import type { FeedbackIA } from './types';
+import { appelJsonGemini } from './ai/adapters/gemini';
+import { CHAINE_CORRECTION } from './ai/gemini-models';
 
-// Prompt système de correction — implémenté tel quel (cahier des charges §6).
-const SYSTEME_CORRECTEUR = `Tu es un correcteur officiel d'épreuves du secondaire camerounais (MINESEC, approche APC).
+// Règles de correction (cahier des charges §6).
+const REGLES_CORRECTEUR = `Tu es un correcteur officiel d'épreuves du secondaire camerounais (MINESEC, approche APC).
 Pour chaque réponse d'élève, tu reçois : l'énoncé, le corrigé type, le barème.
 Tu rends UNIQUEMENT un JSON strict :
 {
@@ -32,30 +34,22 @@ function normaliserNote(note: number, bareme: number): number {
   return Math.min(Math.max(arrondie, 0), bareme);
 }
 
-function parserJson(texte: string, bareme: number): NoteIA | null {
-  // Tolérer un éventuel habillage ```json ... ```
-  const nettoye = texte.replace(/^\s*```(?:json)?\s*/i, '').replace(/\s*```\s*$/, '');
-  const debut = nettoye.indexOf('{');
-  const fin = nettoye.lastIndexOf('}');
-  if (debut === -1 || fin === -1) return null;
-  try {
-    const data = JSON.parse(nettoye.slice(debut, fin + 1));
-    if (typeof data.note !== 'number' || typeof data.appreciation !== 'string') return null;
-    return {
-      note: normaliserNote(data.note, bareme),
-      appreciation: data.appreciation,
-      points_forts: Array.isArray(data.points_forts) ? data.points_forts.map(String) : [],
-      points_a_corriger: Array.isArray(data.points_a_corriger) ? data.points_a_corriger.map(String) : [],
-    };
-  } catch {
-    return null;
-  }
+function versNote(data: unknown, bareme: number): NoteIA | null {
+  if (typeof data !== 'object' || data === null) return null;
+  const d = data as Record<string, unknown>;
+  if (typeof d.note !== 'number' || typeof d.appreciation !== 'string') return null;
+  return {
+    note: normaliserNote(d.note, bareme),
+    appreciation: d.appreciation,
+    points_forts: Array.isArray(d.points_forts) ? d.points_forts.map(String) : [],
+    points_a_corriger: Array.isArray(d.points_a_corriger) ? d.points_a_corriger.map(String) : [],
+  };
 }
 
 /**
- * Corrige une réponse libre via Claude. Retourne null si la correction est
- * indisponible (clé absente, erreur API, JSON invalide après retry) — l'appelant
- * applique alors le repli gracieux (statut correction_partielle).
+ * Corrige une réponse libre via Gemini (chaîne CORRECTION). Retourne null si la
+ * correction est indisponible (clé absente, erreur, JSON invalide après retry)
+ * — l'appelant applique alors le repli gracieux (statut correction_partielle).
  */
 export async function corrigerReponseLibre(
   enonce: string,
@@ -63,10 +57,11 @@ export async function corrigerReponseLibre(
   bareme: number,
   reponseEleve: string
 ): Promise<NoteIA | null> {
-  if (!process.env.ANTHROPIC_API_KEY) return null;
+  if (!process.env.GEMINI_API_KEY) return null;
 
-  const client = new Anthropic();
-  const contenu = `ÉNONCÉ DE LA QUESTION :
+  const instruction = `${REGLES_CORRECTEUR}
+
+ÉNONCÉ DE LA QUESTION :
 ${enonce}
 
 CORRIGÉ TYPE (référence du correcteur) :
@@ -77,24 +72,14 @@ BARÈME : ${bareme} points
 RÉPONSE DE L'ÉLÈVE :
 ${reponseEleve.trim() || '(réponse vide)'}`;
 
-  // 1 tentative + 1 retry si le JSON est invalide (le SDK gère déjà les
-  // retries réseau/429/5xx de son côté).
+  // 1 tentative + 1 retry si le JSON est invalide.
   for (let essai = 0; essai < 2; essai++) {
     try {
-      const message = await client.messages.create({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1024,
-        system: SYSTEME_CORRECTEUR,
-        messages: [{ role: 'user', content: contenu }],
-      });
-      const texte = message.content
-        .filter((b) => b.type === 'text')
-        .map((b) => b.text)
-        .join('');
-      const resultat = parserJson(texte, bareme);
-      if (resultat) return resultat;
+      const rep = await appelJsonGemini(instruction, CHAINE_CORRECTION, 0.2);
+      const note = versNote(rep.contenu, bareme);
+      if (note) return note;
     } catch (e) {
-      console.error(`Correction IA (essai ${essai + 1}) :`, e);
+      console.error(`Correction IA (essai ${essai + 1}) :`, (e as Error)?.message ?? e);
     }
   }
   return null;

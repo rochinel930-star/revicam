@@ -1,22 +1,14 @@
-// Adaptateur LLM Gemini — palier « bon marché » (génération P8 + extraction P4).
+// Adaptateur LLM Gemini — 100 % Gemini, routage multi-modèles économique.
 //
-// Implémente l'interface LlmAdapter avec @google/genai. Modèle par défaut
-// « gemini-2.0-flash » (rapide, économique, sortie JSON native). La clé
-// GEMINI_API_KEY reste côté serveur/script (jamais dans le client).
-//
-// La validation déterministe des générateurs (schéma + KaTeX + anti-injection)
-// s'applique en aval : une sortie non conforme est rejetée, jamais mise en cache.
+// Génération/tâches bon marché → CHAINE_ECO ; correction → CHAINE_CORRECTION
+// (cf. gemini-models.ts, carte établie par preuves). Repli automatique sur
+// quota (429) ou modèle retiré (404) : on passe au modèle suivant de la chaîne.
+// La clé GEMINI_API_KEY reste côté serveur/script.
 
 import { GoogleGenAI } from '@google/genai';
 import type { LlmAdapter, ReponseGeneration, JugementIA } from '@/lib/ai/adapter';
 import type { Artefact } from '@/lib/ingestion/types';
-
-// Modèle par défaut : `gemini-flash-latest` (alias flash courant qui dispose
-// de quota free tier ; `gemini-2.0-flash` a un quota free tier à 0 sur les
-// nouvelles clés AI Studio, et `gemini-2.5-flash` est retiré pour les nouveaux
-// utilisateurs — cf. diagnostic ListModels/generateContent). Surchargable via
-// GEMINI_MODEL.
-const MODELE = process.env.GEMINI_MODEL ?? 'gemini-flash-latest';
+import { CHAINE_ECO } from '@/lib/ai/gemini-models';
 
 let clientMemo: GoogleGenAI | null = null;
 function client(): GoogleGenAI {
@@ -25,51 +17,57 @@ function client(): GoogleGenAI {
 }
 
 /** Extrait le premier objet/tableau JSON d'un texte (tolère un habillage). */
-function parseJson(texte: string): unknown {
+export function parseJson(texte: string): unknown {
   const t = texte.trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '');
   try {
     return JSON.parse(t);
   } catch {
-    const debut = Math.min(
-      ...[t.indexOf('{'), t.indexOf('[')].filter((i) => i >= 0).concat([t.length])
-    );
+    const idxs = [t.indexOf('{'), t.indexOf('[')].filter((i) => i >= 0);
+    const debut = idxs.length ? Math.min(...idxs) : -1;
     const fin = Math.max(t.lastIndexOf('}'), t.lastIndexOf(']'));
-    if (debut < fin) {
+    if (debut >= 0 && debut < fin) {
       try {
         return JSON.parse(t.slice(debut, fin + 1));
       } catch {
-        /* échec → renvoyer null */
+        /* échec */
       }
     }
     return null;
   }
 }
 
-async function appelJson(instruction: string, tentatives = 3): Promise<ReponseGeneration> {
-  for (let i = 0; i < tentatives; i++) {
+const RE_REPLI = /\b429\b|RESOURCE_EXHAUSTED|\b404\b|NOT_FOUND/i;
+
+/**
+ * Appelle Gemini en JSON en essayant chaque modèle de la chaîne ; passe au
+ * suivant sur quota/retrait, remonte toute autre erreur. Réutilisable
+ * (génération ET correction).
+ */
+export async function appelJsonGemini(
+  instruction: string,
+  chaine: string[],
+  temperature = 0.4
+): Promise<ReponseGeneration> {
+  let derniere: unknown;
+  for (const model of chaine) {
     try {
       const res = await client().models.generateContent({
-        model: MODELE,
+        model,
         contents: instruction,
-        config: { responseMimeType: 'application/json', temperature: 0.4 },
+        config: { responseMimeType: 'application/json', temperature },
       });
-      const texte = res.text ?? '';
       return {
-        contenu: parseJson(texte),
+        contenu: parseJson(res.text ?? ''),
         cout_tokens: res.usageMetadata?.totalTokenCount ?? 0,
-        modele: MODELE,
+        modele: model,
       };
     } catch (e) {
-      const msg = String((e as Error)?.message ?? e);
-      // Limites de débit free tier : on patiente puis on réessaie.
-      if (i < tentatives - 1 && /\b429\b|RESOURCE_EXHAUSTED/i.test(msg)) {
-        await new Promise((r) => setTimeout(r, 15000));
-        continue;
-      }
+      derniere = e;
+      if (RE_REPLI.test(String((e as Error)?.message ?? e))) continue; // modèle suivant
       throw e;
     }
   }
-  throw new Error('appelJson: tentatives épuisées');
+  throw derniere ?? new Error('appelJsonGemini : aucun modèle disponible dans la chaîne');
 }
 
 export function creerGeminiAdapter(): LlmAdapter {
@@ -78,13 +76,12 @@ export function creerGeminiAdapter(): LlmAdapter {
     disponible: () => Boolean(process.env.GEMINI_API_KEY),
 
     async generer(instruction: string): Promise<ReponseGeneration> {
-      return appelJson(instruction);
+      return appelJsonGemini(instruction, CHAINE_ECO, 0.4);
     },
 
     async extraire(texte: string, type: string): Promise<unknown> {
-      const prompt =
-        `Extrais le contenu suivant (type « ${type} ») en JSON canonique strict, sans commentaire.\n\n${texte}`;
-      return (await appelJson(prompt)).contenu;
+      const prompt = `Extrais le contenu suivant (type « ${type} ») en JSON canonique strict, sans commentaire.\n\n${texte}`;
+      return (await appelJsonGemini(prompt, CHAINE_ECO, 0.2)).contenu;
     },
 
     async juger(source: string, extraction: unknown): Promise<JugementIA> {
@@ -92,16 +89,15 @@ export function creerGeminiAdapter(): LlmAdapter {
         `Évalue l'adéquation (grounding) entre le DOCUMENT SOURCE et l'EXTRACTION. ` +
         `Réponds en JSON strict {"score": nombre entre 0 et 1, "commentaire": string}.\n\n` +
         `DOCUMENT SOURCE:\n${source}\n\nEXTRACTION:\n${JSON.stringify(extraction)}`;
-      const rep = await appelJson(prompt);
+      const rep = await appelJsonGemini(prompt, CHAINE_ECO, 0.2);
       const c = rep.contenu as { score?: unknown; commentaire?: unknown } | null;
       const score = typeof c?.score === 'number' ? Math.max(0, Math.min(1, c.score)) : 0;
       const commentaire = typeof c?.commentaire === 'string' ? c.commentaire : '';
       return { score, commentaire };
     },
 
-    // OCR multimodal (images/PDF) : à implémenter si l'ingestion binaire est activée.
     async ocr(_artefact: Artefact): Promise<string> {
-      throw new Error("OCR Gemini non encore implémenté (ingestion binaire non activée)");
+      throw new Error('OCR Gemini non encore implémenté (ingestion binaire non activée)');
     },
   };
 }

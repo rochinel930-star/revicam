@@ -40,12 +40,13 @@ async function checkBase(): Promise<Check> {
 
 function checkLlm(): Check {
   // Contrôle de configuration uniquement — on ne contacte pas l'API.
-  const configure = Boolean(process.env.ANTHROPIC_API_KEY);
+  // 100 % Gemini : génération (P8) et correction (grading) via GEMINI_API_KEY.
+  const configure = Boolean(process.env.GEMINI_API_KEY);
   return {
     nom: 'llm_adapter',
     etat: configure ? 'up' : 'down',
-    critique: false, // la correction IA est optionnelle : non bloquant.
-    detail: configure ? undefined : 'ANTHROPIC_API_KEY absente',
+    critique: false, // l'IA est optionnelle : non bloquant.
+    detail: configure ? 'gemini' : 'GEMINI_API_KEY absente',
   };
 }
 

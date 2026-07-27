@@ -28,7 +28,7 @@ async function main() {
   // Enregistrer l'adaptateur bon marché si la clé est disponible.
   if (process.env.GEMINI_API_KEY) {
     enregistrerAdapter(creerGeminiAdapter());
-    console.log(`Adaptateur : gemini (${process.env.GEMINI_MODEL ?? 'gemini-flash-latest'})`);
+    console.log('Adaptateur : gemini (chaîne éco : flash-lite-latest → 3.1-flash-lite → flash-latest)');
   }
 
   if (!adapterActif().disponible()) {
