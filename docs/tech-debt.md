@@ -11,7 +11,9 @@ correction s'inscrit ici (cf. Handbook P1.6). Statuts : `ouvert`,
 | TD-003 | basse | CSP `script-src 'unsafe-inline'` | Toléré tant que Next injecte le bootstrap d'hydratation sans nonce. Durcir via middleware à nonce quand le périmètre le justifiera. | accepté | P1 |
 | TD-004 | basse | Flags : pas de cache TTL sur `getFlagRemote` | Lecture base à chaque appel distant. Acceptable (usage hors chemin chaud) ; ajouter un cache mémoire si un flag distant entre dans le chemin chaud. | accepté | P1 |
 | TD-005 | basse | Lectures applicatives via `modules` (pas encore `chapitre`) | Les pages lisent toujours la table `modules` (présente en prod). La bascule vers la vue canonique `chapitre` + lectures programme/série est reportée aux phases consommatrices (P7/P10) pour éviter code mort et régression pré-migration. Vue `chapitre` validée en intégration. | accepté | P2 |
-| TD-006 | moyenne | Migrations 0007–0014 non appliquées à la prod | Validées en intégration PGlite (0001→0014). L'application à la base de production est une étape d'exploitation externe (voir rapport P2). | ouvert | P2 |
+| TD-006 | moyenne | Migrations 0007–0017 non appliquées à la prod | Validées en intégration PGlite (0001→0017). L'application à la base de production est une étape d'exploitation externe. | ouvert | P2/P3/P4 |
+| TD-007 | basse | Adaptateurs LLM concrets non branchés (P4) | `ai/adapter.ts` par défaut NOOP ; Gemini/Anthropic à injecter au démarrage serveur selon les clés (le pipeline déterministe tourne sans). | ouvert | P4 |
+| TD-008 | basse | Admin gardé par jeton partagé (P4) | `/api/admin/*` protégées par `ADMIN_API_TOKEN`. Migrer vers une vérification de session staff (auth serveur) quand disponible. | accepté | P4 |
 
 ## Convention
 
