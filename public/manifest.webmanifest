@@ -1,0 +1,21 @@
+{
+  "name": "RéviCam — Révision Cameroun",
+  "short_name": "RéviCam",
+  "description": "Lis ton cours, compose comme en salle d'examen, reçois ta note immédiatement.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f8fafc",
+  "theme_color": "#1a237e",
+  "lang": "fr",
+  "categories": ["education"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

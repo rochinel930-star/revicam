@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="RéviCam">
+  <rect width="512" height="512" rx="96" fill="#1a237e"/>
+  <text x="50%" y="52%" text-anchor="middle" dominant-baseline="central"
+        font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif"
+        font-size="230" font-weight="700" fill="#d4af37">R</text>
+  <rect x="120" y="360" width="272" height="26" rx="13" fill="#ffffff" opacity="0.9"/>
+</svg>

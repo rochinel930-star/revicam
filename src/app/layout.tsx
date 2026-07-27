@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import Header from '@/components/Header';
 import BottomNav from '@/components/BottomNav';
+import ServiceWorkerRegister from '@/components/ServiceWorkerRegister';
 import { SITE_NAME, SITE_TAGLINE, SITE_URL } from '@/lib/config';
 
 export const metadata: Metadata = {
@@ -11,6 +12,8 @@ export const metadata: Metadata = {
     template: `%s · ${SITE_NAME}`,
   },
   description: SITE_TAGLINE,
+  manifest: '/manifest.webmanifest',
+  appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: 'default' },
 };
 
 export const viewport: Viewport = {
@@ -27,6 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           {children}
         </main>
         <BottomNav />
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
