@@ -94,6 +94,52 @@ export interface ChaineNotion {
   pays_code: string;
 }
 
+// ── Outils IA par leçon (Phase P8) ──────────────────────────────────
+export type TypeArtefactLecon =
+  | 'qcm'
+  | 'flashcards'
+  | 'vrai_faux'
+  | 'questions_ouvertes'
+  | 'explications';
+
+export interface Flashcard {
+  recto: string;
+  verso_mdx: string;
+}
+
+export interface VraiFauxItem {
+  affirmation_mdx: string;
+  correct: boolean;
+  explication_mdx: string | null;
+}
+
+/** Partie PUBLIQUE d'une question ouverte (la rubrique reste secrète). */
+export interface QuestionOuverte {
+  question_mdx: string;
+  bareme: number;
+}
+
+export interface Explication {
+  titre: string;
+  corps_mdx: string;
+}
+
+/** Rubrique SECRÈTE de correction d'une question ouverte (server-only). */
+export interface RubriqueOuverte {
+  corrige_type_mdx: string;
+  bareme: number;
+}
+
+/** Artefact tel que servi à l'élève (vue lesson_artifact_public, sans secret). */
+export interface LessonArtifactPublic {
+  id: string;
+  lecon_id: string;
+  type: TypeArtefactLecon;
+  signature: string;
+  lesson_version: string;
+  payload: unknown; // typé selon `type` par les consommateurs
+}
+
 export type StatutVersion = 'brouillon' | 'publie' | 'archive';
 
 export interface ContentVersion {

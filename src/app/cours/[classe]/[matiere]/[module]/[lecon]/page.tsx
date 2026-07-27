@@ -5,8 +5,14 @@ import QcmPlayer from '@/components/QcmPlayer';
 import BilingualGame from '@/components/BilingualGame';
 import MarqueVue from '@/components/MarqueVue';
 import BoutonImprimerFiche from '@/components/BoutonImprimerFiche';
+import Flashcards from '@/components/Flashcards';
+import VraiFaux from '@/components/VraiFaux';
+import ExplainPanel from '@/components/ExplainPanel';
+import QuestionsOuvertes from '@/components/QuestionsOuvertes';
 import { mdToHtml } from '@/lib/markdown';
 import { construireContexteLecon, contexteVersJsonLd } from '@/lib/lesson-context';
+import { getArtefactsCourants } from '@/lib/ai/artifacts-repo';
+import { preparerOutils, aDesOutils } from '@/lib/ai/prepare-artifacts';
 import { TYPE_EPREUVE_LABELS } from '@/lib/types';
 import {
   getClasse, getClasses, getMatiere, getMatieresDeClasse, getModules,
@@ -67,6 +73,7 @@ const SOMMAIRE = [
   { id: 'essentiel', label: '🧠 Essentiel' },
   { id: 'bilingue', label: '🌍 Bilingue' },
   { id: 'ressources', label: '✅ Ressources' },
+  { id: 'outils', label: '🤖 Outils IA' },
   { id: 'competences', label: '💪 Compétences' },
   { id: 'sujets', label: '📄 Sujets liés' },
 ];
@@ -136,6 +143,10 @@ export default async function PageLecon({ params }: { params: Promise<Params> })
     classe: classe.nom,
     chapitre: `Module ${module_.numero} — ${module_.titre}`,
   });
+
+  // Outils IA par leçon (Phase P8) : LECTURE du cache (0 appel IA au runtime).
+  // Résilient : aucun outil si non générés / migration non appliquée.
+  const outils = preparerOutils(await getArtefactsCourants(lecon.id, contexte.signature));
 
   return (
     <div data-lecon-signature={contexte.signature}>
@@ -219,6 +230,55 @@ export default async function PageLecon({ params }: { params: Promise<Params> })
             {lecon.qcm.length} questions, correction instantanée. Vise au moins 10/20 !
           </p>
           <QcmPlayer leconId={lecon.id} items={lecon.qcm} />
+        </section>
+      )}
+
+      {/* ── 🤖 Outils IA par leçon (cache mutualisé, 0 IA au runtime) ── */}
+      {aDesOutils(outils) && (
+        <section id="outils" className="mt-6 scroll-mt-24">
+          <h2 className="mb-1 text-lg font-bold text-navy">🤖 Outils de révision IA</h2>
+          <p className="mb-3 text-sm text-slate-600">
+            Générés une fois à partir de cette leçon, partagés par tous les élèves.
+          </p>
+
+          {outils.qcm && outils.qcm.length > 0 && (
+            <div className="mb-5">
+              <h3 className="mb-2 font-bold text-slate-800">Quiz express</h3>
+              <QcmPlayer leconId={`${lecon.id}:ia-qcm`} items={outils.qcm} />
+            </div>
+          )}
+
+          {outils.flashcards && outils.flashcards.length > 0 && (
+            <div className="mb-5">
+              <h3 className="mb-2 font-bold text-slate-800">🃏 Flashcards</h3>
+              <Flashcards cartes={outils.flashcards} />
+            </div>
+          )}
+
+          {outils.vraiFaux && outils.vraiFaux.length > 0 && (
+            <div className="mb-5">
+              <h3 className="mb-2 font-bold text-slate-800">✔️ Vrai / Faux</h3>
+              <VraiFaux items={outils.vraiFaux} />
+            </div>
+          )}
+
+          {outils.explications && outils.explications.length > 0 && (
+            <div className="mb-5">
+              <h3 className="mb-2 font-bold text-slate-800">💡 Expliqué autrement</h3>
+              <ExplainPanel items={outils.explications} />
+            </div>
+          )}
+
+          {outils.questionsOuvertes && outils.questionsOuvertes.length > 0 && outils.qoSignature && (
+            <div className="mb-2">
+              <h3 className="mb-2 font-bold text-slate-800">✍️ Questions ouvertes (correction IA)</h3>
+              <QuestionsOuvertes
+                leconId={lecon.id}
+                signature={outils.qoSignature}
+                items={outils.questionsOuvertes}
+              />
+            </div>
+          )}
         </section>
       )}
 

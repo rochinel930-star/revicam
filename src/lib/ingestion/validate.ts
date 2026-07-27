@@ -9,34 +9,21 @@
 //   - compilation KaTeX de toutes les maths ($…$ / $$…$$, y compris \ce{}) ;
 //   - anti-injection : le rendu assaini ne laisse passer aucun script/handler.
 
-import katex from 'katex';
-import 'katex/contrib/mhchem';
-import { mdToHtml } from '@/lib/markdown';
+import { problemesMdx } from '@/lib/render/validate-mdx';
 import type { ExtractionEpreuve, Probleme, QuestionExtraite, Referentiel } from './types';
 
 function estObjet(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null;
 }
 
-/** Compile chaque segment mathématique ; remonte les expressions invalides. */
-function verifierMaths(texte: string, champ: string, problemes: Probleme[]): void {
-  const segments: Array<{ expr: string; display: boolean }> = [];
-  for (const m of texte.matchAll(/\$\$([\s\S]*?)\$\$/g)) segments.push({ expr: m[1], display: true });
-  for (const m of texte.matchAll(/(?<!\$)\$(?!\$)([^$\n]+?)\$/g)) segments.push({ expr: m[1], display: false });
-  for (const { expr, display } of segments) {
-    try {
-      katex.renderToString(expr, { throwOnError: true, output: 'mathml', strict: false, displayMode: display });
-    } catch {
-      problemes.push({ code: 'maths_invalide', message: `Expression KaTeX invalide : ${expr.trim().slice(0, 40)}`, champ });
-    }
-  }
-}
-
-/** Vérifie qu'aucune charge active ne survit à l'assainissement. */
-function verifierInjection(mdx: string, champ: string, problemes: Probleme[]): void {
-  const html = mdToHtml(mdx);
-  if (/<script|onerror=|onload=|javascript:|<iframe/i.test(html)) {
-    problemes.push({ code: 'injection', message: 'Contenu potentiellement dangereux détecté', champ });
+/** Contrôle MDX déterministe (maths KaTeX + anti-injection) → Probleme[]. */
+function verifierMdx(mdx: string, champ: string, problemes: Probleme[]): void {
+  for (const p of problemesMdx(mdx)) {
+    problemes.push({
+      code: p.startsWith('maths') ? 'maths_invalide' : 'injection',
+      message: p,
+      champ,
+    });
   }
 }
 
@@ -55,8 +42,7 @@ function validerQuestion(q: unknown, i: number, problemes: Probleme[]): Question
   if (!type) problemes.push({ code: 'type_invalide', message: 'Type de question invalide', champ });
 
   if (enonce) {
-    verifierMaths(enonce, champ, problemes);
-    verifierInjection(enonce, champ, problemes);
+    verifierMdx(enonce, champ, problemes);
   }
 
   let options: string[] | undefined;
@@ -75,8 +61,7 @@ function validerQuestion(q: unknown, i: number, problemes: Probleme[]): Question
 
   const corrige = typeof q.corrige_type_mdx === 'string' ? q.corrige_type_mdx : null;
   if (corrige) {
-    verifierMaths(corrige, `${champ}.corrige`, problemes);
-    verifierInjection(corrige, `${champ}.corrige`, problemes);
+    verifierMdx(corrige, `${champ}.corrige`, problemes);
   }
 
   if (!type) return null;

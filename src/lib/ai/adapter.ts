@@ -17,6 +17,13 @@ export interface JugementIA {
   commentaire: string;
 }
 
+/** Réponse de génération : contenu structuré + coût observé. */
+export interface ReponseGeneration {
+  contenu: unknown;
+  cout_tokens?: number;
+  modele?: string;
+}
+
 export interface LlmAdapter {
   nom: string;
   disponible(): boolean;
@@ -26,6 +33,8 @@ export interface LlmAdapter {
   extraire?(texte: string, type: string): Promise<unknown>;
   /** Jugement de grounding d'une extraction (premium, ciblé). */
   juger?(source: string, extraction: unknown): Promise<JugementIA>;
+  /** Génération d'un artefact pédagogique (modèle bon marché, en batch). */
+  generer?(instruction: string, contexte: string): Promise<ReponseGeneration>;
 }
 
 /** Adaptateur par défaut : indisponible (aucun appel réseau). */

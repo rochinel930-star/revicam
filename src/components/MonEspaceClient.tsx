@@ -6,6 +6,7 @@
 import Link from 'next/link';
 import { getProgress, getHistorique, type ProgressLecon, type HistoriqueAttempt } from '@/lib/local';
 import { couleurNote } from '@/lib/config';
+import { detecterFaiblesses } from '@/lib/weakness';
 import { useMounted } from '@/lib/use-mounted';
 
 export default function MonEspaceClient() {
@@ -20,6 +21,7 @@ export default function MonEspaceClient() {
   const lecons = Object.values(progress);
   const terminees = lecons.filter((p) => p.statut === 'terminee').length;
   const qcmFaits = lecons.filter((p) => p.statut !== 'vue').length;
+  const faiblesses = detecterFaiblesses(progress);
 
   return (
     <div className="space-y-6">
@@ -46,6 +48,12 @@ export default function MonEspaceClient() {
               <dt className="text-[0.7rem] text-slate-500">terminées (≥ 10/20)</dt>
             </div>
           </dl>
+        )}
+        {faiblesses.length > 0 && (
+          <p className="mt-3 rounded-md bg-physique-bg px-3 py-2 text-sm text-slate-700">
+            🎯 <span className="font-semibold">{faiblesses.length}</span>{' '}
+            leçon{faiblesses.length > 1 ? 's' : ''} à revoir en priorité (QCM &lt; 10/20).
+          </p>
         )}
       </section>
 
