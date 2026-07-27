@@ -11,7 +11,12 @@ import { GoogleGenAI } from '@google/genai';
 import type { LlmAdapter, ReponseGeneration, JugementIA } from '@/lib/ai/adapter';
 import type { Artefact } from '@/lib/ingestion/types';
 
-const MODELE = process.env.GEMINI_MODEL ?? 'gemini-2.0-flash';
+// Modèle par défaut : `gemini-flash-latest` (alias flash courant qui dispose
+// de quota free tier ; `gemini-2.0-flash` a un quota free tier à 0 sur les
+// nouvelles clés AI Studio, et `gemini-2.5-flash` est retiré pour les nouveaux
+// utilisateurs — cf. diagnostic ListModels/generateContent). Surchargable via
+// GEMINI_MODEL.
+const MODELE = process.env.GEMINI_MODEL ?? 'gemini-flash-latest';
 
 let clientMemo: GoogleGenAI | null = null;
 function client(): GoogleGenAI {
@@ -40,18 +45,31 @@ function parseJson(texte: string): unknown {
   }
 }
 
-async function appelJson(instruction: string): Promise<ReponseGeneration> {
-  const res = await client().models.generateContent({
-    model: MODELE,
-    contents: instruction,
-    config: { responseMimeType: 'application/json', temperature: 0.4 },
-  });
-  const texte = res.text ?? '';
-  return {
-    contenu: parseJson(texte),
-    cout_tokens: res.usageMetadata?.totalTokenCount ?? 0,
-    modele: MODELE,
-  };
+async function appelJson(instruction: string, tentatives = 3): Promise<ReponseGeneration> {
+  for (let i = 0; i < tentatives; i++) {
+    try {
+      const res = await client().models.generateContent({
+        model: MODELE,
+        contents: instruction,
+        config: { responseMimeType: 'application/json', temperature: 0.4 },
+      });
+      const texte = res.text ?? '';
+      return {
+        contenu: parseJson(texte),
+        cout_tokens: res.usageMetadata?.totalTokenCount ?? 0,
+        modele: MODELE,
+      };
+    } catch (e) {
+      const msg = String((e as Error)?.message ?? e);
+      // Limites de débit free tier : on patiente puis on réessaie.
+      if (i < tentatives - 1 && /\b429\b|RESOURCE_EXHAUSTED/i.test(msg)) {
+        await new Promise((r) => setTimeout(r, 15000));
+        continue;
+      }
+      throw e;
+    }
+  }
+  throw new Error('appelJson: tentatives épuisées');
 }
 
 export function creerGeminiAdapter(): LlmAdapter {
