@@ -6,6 +6,7 @@ import BilingualGame from '@/components/BilingualGame';
 import MarqueVue from '@/components/MarqueVue';
 import BoutonImprimerFiche from '@/components/BoutonImprimerFiche';
 import { mdToHtml } from '@/lib/markdown';
+import { construireContexteLecon, contexteVersJsonLd } from '@/lib/lesson-context';
 import { TYPE_EPREUVE_LABELS } from '@/lib/types';
 import {
   getClasse, getClasses, getMatiere, getMatieresDeClasse, getModules,
@@ -128,8 +129,20 @@ export default async function PageLecon({ params }: { params: Promise<Params> })
     getCompositionsDeLaLecon(lecon.id),
   ]);
 
+  // Contexte « leçon courante » (Phase P7) : ancrage IA + JSON-LD SEO.
+  const contexte = construireContexteLecon({
+    lecon,
+    matiere: matiere.nom,
+    classe: classe.nom,
+    chapitre: `Module ${module_.numero} — ${module_.titre}`,
+  });
+
   return (
-    <div>
+    <div data-lecon-signature={contexte.signature}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contexteVersJsonLd(contexte)) }}
+      />
       <MarqueVue leconId={lecon.id} />
       <Breadcrumb miettes={miettes} />
 
