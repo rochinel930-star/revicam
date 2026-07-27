@@ -6,17 +6,18 @@
 // adaptateur LLM enregistré (clé absente), rapporte « indisponible » et sort
 // proprement — les étapes déterministes de validation restent la vérité.
 //
-// Un fournisseur concret s'enregistre ici via enregistrerAdapter(...) selon les
-// clés d'environnement (non inclus : cf. dette TD-007). Aucune écriture en prod
-// n'est déclenchée automatiquement par le build.
+// Le fournisseur est enregistré ci-dessous selon les clés d'environnement :
+// Gemini (palier « bon marché ») si GEMINI_API_KEY est présent.
 
-import 'dotenv/config';
+import dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
 import { sbAdmin } from '../src/lib/supabase';
 import { construireContexteLecon } from '../src/lib/lesson-context';
 import { genererArtefactsLecon } from '../src/lib/ai/generate-artifacts';
 import { creerPersisteurArtefacts } from '../src/lib/ai/artifacts-persist';
 import { sousBudget } from '../src/lib/ai/cost';
-import { adapterActif } from '../src/lib/ai/adapter';
+import { adapterActif, enregistrerAdapter } from '../src/lib/ai/adapter';
+import { creerGeminiAdapter } from '../src/lib/ai/adapters/gemini';
 import type { Lecon } from '../src/lib/types';
 
 interface LigneLecon extends Lecon {
@@ -24,6 +25,12 @@ interface LigneLecon extends Lecon {
 }
 
 async function main() {
+  // Enregistrer l'adaptateur bon marché si la clé est disponible.
+  if (process.env.GEMINI_API_KEY) {
+    enregistrerAdapter(creerGeminiAdapter());
+    console.log(`Adaptateur : gemini (${process.env.GEMINI_MODEL ?? 'gemini-2.0-flash'})`);
+  }
+
   if (!adapterActif().disponible()) {
     console.log('⚠️  Aucun adaptateur LLM disponible — génération ignorée (validation déterministe prête).');
     return;
@@ -34,7 +41,9 @@ async function main() {
     .from('lecons')
     .select(
       'id, module_id, numero, titre, slug, duree_lecture_min, objectifs, contenu_mdx, essentiel_mdx, jeu_bilingue, qcm, exercices, publie, ' +
-        'modules!inner(numero, titre, classes!inner(nom), matieres!inner(nom))'
+        // Désambiguïsation : depuis P2, lecons a deux FK vers modules
+        // (module_id + chapitre_id). On force la relation via module_id.
+        'modules!lecons_module_id_fkey!inner(numero, titre, classes!inner(nom), matieres!inner(nom))'
     )
     .eq('publie', true);
   if (error) throw error;
@@ -61,6 +70,9 @@ async function main() {
     console.log(
       `• ${ligne.slug}: ${artefacts.length} artefact(s), ${erreurs.length} erreur(s), coût ~${coutTotalEur.toFixed(4)} €`
     );
+    for (const e of erreurs) {
+      console.log(`    ✗ ${e.type}: ${e.problemes.slice(0, 4).join(' | ')}`);
+    }
   }
 
   console.log(`\n✅ ${total} artefact(s) mis en cache.`);

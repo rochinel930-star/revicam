@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.5",
+    "@google/genai": "^2.13.0",
     "@supabase/supabase-js": "^2.110.8",
     "katex": "^0.18.1",
     "next": "16.2.11",
