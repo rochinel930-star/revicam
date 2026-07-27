@@ -1,0 +1,50 @@
+name: CI
+
+# Portes bloquantes — Phase P1. Un échec ici doit bloquer le merge sur main
+# (activer la protection de branche : Settings → Branches → require status
+# checks → sélectionner « build »). Voir docs/adr/0002.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: typecheck · lint · render:check · test · build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck (tsc --noEmit)
+        run: npm run typecheck
+
+      - name: Lint (eslint)
+        run: npm run lint
+
+      - name: Render guard (render:check)
+        run: npm run render:check
+
+      - name: Tests (vitest)
+        run: npm test
+
+      - name: Build (next build)
+        run: npm run build
+        env:
+          # Le build fonctionne sans secret (valeurs de repli dans supabase.ts).
+          # Fournir des variables neutres pour un build reproductible.
+          NEXT_TELEMETRY_DISABLED: "1"
