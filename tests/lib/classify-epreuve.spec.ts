@@ -72,6 +72,6 @@ describe('construireTitre', () => {
       etablissement: 'Lycée de Nkolbisson',
       session: null,
     });
-    expect(titre).toBe('Épreuve séquentielle N°2 — Mathematiques — Terminale C — Lycée de Nkolbisson (2023)');
+    expect(titre).toBe('Mathématiques — Lycée de Nkolbisson — Séquence N°2 — Terminale C — 2023');
   });
 });

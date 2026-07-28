@@ -79,6 +79,24 @@ const NIVEAU_LABELS: Record<string, string> = {
   sixieme: '6ᵉ',
 };
 
+const MATIERE_LABELS: Record<string, string> = {
+  mathematiques: 'Mathématiques',
+  physique: 'Physique',
+  chimie: 'Chimie',
+  svt: 'SVTEEHB',
+  francais: 'Français',
+  anglais: 'Anglais',
+  philosophie: 'Philosophie',
+  histoire: 'Histoire',
+  geographie: 'Géographie',
+  'histoire-geographie': 'Histoire-Géographie',
+  informatique: 'Informatique',
+  ecm: 'ECM',
+  economie: 'Économie',
+};
+
+const TYPES_OFFICIELS = ['bepc', 'probatoire', 'baccalaureat', 'cep'];
+
 function trouver<T extends { re: RegExp }>(liste: T[], texte: string): T | null {
   return liste.find((x) => x.re.test(texte)) ?? null;
 }
@@ -150,20 +168,34 @@ export function classifierEntete(entete: string, nomFichier = ''): Classificatio
   return { champs, confiance, titre: construireTitre(champs), manquants, source: 'heuristique' };
 }
 
-/** Construit un nom d'affichage clair à partir des champs classés. */
+/**
+ * Construit un nom d'affichage clair, dans la convention camerounaise
+ * (MATIÈRE en tête), familière aux élèves :
+ *   séquentiel : « SVTEEHB — Collège Mongo Beti — Séquence N°6 — 6ᵉ — 2025 »
+ *   officiel   : « Mathématiques — Probatoire D — Session 2026 »
+ */
 export function construireTitre(c: ChampsEpreuve): string {
-  const parts: string[] = [];
-  if (c.type) {
-    let t = TYPE_LABELS[c.type];
-    if (c.type === 'sequentielle' && c.numero_sequence) t += ` N°${c.numero_sequence}`;
-    if (c.type === 'composition' && c.trimestre) t += ` ${c.trimestre}ᵉ trimestre`;
-    parts.push(t);
+  const mat = c.matiere ? (MATIERE_LABELS[c.matiere] ?? c.matiere.replace(/-/g, ' ').replace(/^\w/, (x) => x.toUpperCase())) : 'Épreuve';
+  const classe = c.niveau
+    ? `${NIVEAU_LABELS[c.niveau] ?? c.niveau}${c.serie ? ' ' + c.serie : ''}`
+    : c.serie
+      ? `Série ${c.serie}`
+      : null;
+
+  const parts: (string | null)[] = [mat];
+
+  if (c.type && TYPES_OFFICIELS.includes(c.type)) {
+    parts.push(`${TYPE_LABELS[c.type]}${c.serie ? ' ' + c.serie : ''}`);
+    if (c.annee) parts.push(`Session ${c.annee}`);
+  } else {
+    if (c.etablissement) parts.push(c.etablissement);
+    if (c.type === 'sequentielle' && c.numero_sequence) parts.push(`Séquence N°${c.numero_sequence}`);
+    else if (c.type === 'composition') parts.push(`Composition${c.trimestre ? ` ${c.trimestre}ᵉ trim.` : ''}`);
+    else if (c.type === 'blanc') parts.push('Examen blanc');
+    else if (c.type === 'controle') parts.push('Contrôle continu');
+    if (classe) parts.push(classe);
+    if (c.annee) parts.push(String(c.annee));
   }
-  const mat = c.matiere ? c.matiere.replace(/-/g, ' ').replace(/^\w/, (x) => x.toUpperCase()) : null;
-  if (mat) parts.push(mat);
-  if (c.niveau) parts.push(`${NIVEAU_LABELS[c.niveau] ?? c.niveau}${c.serie ? ' ' + c.serie : ''}`);
-  else if (c.serie) parts.push(`Série ${c.serie}`);
-  if (c.etablissement) parts.push(c.etablissement);
-  if (c.annee) parts.push(`(${c.annee})`);
-  return parts.join(' — ').replace(' — (', ' (') || 'Épreuve à classer';
+
+  return parts.filter(Boolean).join(' — ') || 'Épreuve à classer';
 }

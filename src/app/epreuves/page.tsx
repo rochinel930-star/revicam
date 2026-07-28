@@ -72,6 +72,11 @@ export default async function PageEpreuves({
   const annees = [...new Set(epreuves.map((e) => e.annee))].sort((a, b) => b - a);
   const anneesChoix = annees.length > 0 ? annees : [new Date().getFullYear()];
 
+  // Navigation « classe d'abord » (comme un élève camerounais cherche).
+  const college = classes.filter((c) => c.ordre < 50);
+  const secondCycle = classes.filter((c) => c.ordre >= 50);
+  const classeActive = classes.find((c) => c.slug === filtres.classe) ?? null;
+
   return (
     <div>
       <Breadcrumb miettes={[{ label: 'Épreuves' }]} />
@@ -81,15 +86,41 @@ export default async function PageEpreuves({
         Baccalauréat. Les épreuves marquées ✍️ se composent en ligne avec correction immédiate.
       </p>
 
-      {/* ── Filtres combinables ── */}
+      {/* ── Navigation classe-first ── */}
+      <section className="mb-4 rounded-lg border border-slate-200 bg-white p-3">
+        <h2 className="mb-2 text-sm font-bold text-slate-700">🎓 Choisis ta classe</h2>
+        {([['Collège', college], ['Second cycle', secondCycle]] as const).map(([label, items]) =>
+          items.length === 0 ? null : (
+            <div key={label} className="mb-2 last:mb-0">
+              <p className="mb-1 text-[0.7rem] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
+              <div className="flex flex-wrap gap-2">
+                {items.map((c) => (
+                  <Link
+                    key={c.id}
+                    href={urlAvec(filtres, { classe: filtres.classe === c.slug ? undefined : c.slug })}
+                    className={`rounded-lg border px-3.5 py-2 text-sm font-bold transition ${
+                      filtres.classe === c.slug
+                        ? 'border-navy bg-navy text-white shadow'
+                        : 'border-slate-300 bg-white text-slate-700 hover:border-navy hover:text-navy'
+                    }`}
+                  >
+                    {c.nom}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )
+        )}
+        {classeActive && (
+          <p className="mt-2 text-xs text-slate-500">
+            Classe : <span className="font-semibold text-navy">{classeActive.nom}</span> —{' '}
+            <Link href={urlAvec(filtres, { classe: undefined })} className="underline">tout afficher</Link>
+          </p>
+        )}
+      </section>
+
+      {/* ── Filtres complémentaires ── */}
       <div className="space-y-2 rounded-lg border border-slate-200 bg-white p-3">
-        <div className="flex flex-wrap items-center gap-1.5">
-          <span className="w-20 shrink-0 text-xs font-semibold text-slate-500">Classe</span>
-          <Chip actif={!filtres.classe} href={urlAvec(filtres, { classe: undefined })}>Toutes</Chip>
-          {classes.map((c) => (
-            <Chip key={c.id} actif={filtres.classe === c.slug} href={urlAvec(filtres, { classe: c.slug })}>{c.nom}</Chip>
-          ))}
-        </div>
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="w-20 shrink-0 text-xs font-semibold text-slate-500">Matière</span>
           <Chip actif={!filtres.matiere} href={urlAvec(filtres, { matiere: undefined })}>Toutes</Chip>
