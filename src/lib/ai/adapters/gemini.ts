@@ -7,7 +7,6 @@
 
 import { GoogleGenAI } from '@google/genai';
 import type { LlmAdapter, ReponseGeneration, JugementIA } from '@/lib/ai/adapter';
-import type { Artefact } from '@/lib/ingestion/types';
 import { CHAINE_ECO } from '@/lib/ai/gemini-models';
 
 let clientMemo: GoogleGenAI | null = null;
@@ -130,7 +129,7 @@ export function creerGeminiAdapter(): LlmAdapter {
       return { score, commentaire };
     },
 
-    async ocr(_artefact: Artefact): Promise<string> {
+    async ocr(): Promise<string> {
       throw new Error('OCR Gemini non encore implémenté (ingestion binaire non activée)');
     },
   };
