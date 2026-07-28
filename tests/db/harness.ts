@@ -13,6 +13,7 @@
 // fonctions de versionnage — le tout reproductible en CI.
 
 import { PGlite } from '@electric-sql/pglite';
+import { pg_trgm } from '@electric-sql/pglite/contrib/pg_trgm';
 import { readFileSync, readdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -109,7 +110,7 @@ export interface TestDb {
 
 /** Démarre une base neuve avec toutes les migrations appliquées. */
 export async function setupDb(): Promise<TestDb> {
-  const db = new PGlite();
+  const db = new PGlite({ extensions: { pg_trgm } });
   await db.exec(BOOTSTRAP);
   for (const file of migrationFiles()) {
     try {
